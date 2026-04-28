@@ -8,9 +8,8 @@
 </pre>
 
 <p align="left">
-  ## <strong>T E A M &nbsp; T E S T &nbsp; H U B</strong><br />
-  <sub>test · build · iterate</sub><br /><br />
-  <a href="https://teamtesthub.us"><strong>teamtesthub.us</strong></a>
+  ## <strong>T E A M T E S T H U B</strong><br />
+    <a href="https://teamtesthub.us"><strong>teamtesthub.us</strong></a>
   &nbsp;·&nbsp;
 </p>
 
