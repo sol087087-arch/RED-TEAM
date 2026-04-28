@@ -12,11 +12,12 @@
   <sub>test · build · iterate</sub><br /><br />
   <a href="https://teamtesthub.us"><strong>teamtesthub.us</strong></a>
   &nbsp;·&nbsp;
+  <a href="https://www.teamtesthub.us">www.teamtesthub.us</a>
 </p>
 
 <p align="center">
   <strong>Drop one prompt. Watch every model squirm (or comply).</strong><br />
-  Built for red teamers who are tired of copy-pasting the same prompt into twelve browser tabs - and for prompt engineers, researchers, and anyone who wants to know which models will actually do the thing.
+  Built for red teamers who are tired of copy-pasting the same prompt into twelve browser tabs — and for prompt engineers, researchers, and anyone who wants to know which models will actually do the thing.
 </p>
 
 ---
@@ -25,14 +26,14 @@
 
 | | |
 |--|--|
-| **Parallel blast** | Send your prompt to every model you pick - **simultaneously**, each in isolation. |
+| **Parallel blast** | Send your prompt to every model you pick — **simultaneously**, each in isolation. |
 | **Live results** | Replies stream in as they arrive, with latency and a **pass / block / error** readout. |
-| **Refusal radar** | Heuristic detection across safety-ish refusals (explicit content, weapons, drugs, social engineering, “creative refusal theater”, typos like `notprovide`, …). It’s regex-based - useful signal, not a formal audit. |
+| **Refusal radar** | Heuristic detection across safety-ish refusals (explicit content, weapons, drugs, social engineering, “creative refusal theater”, typos like `notprovide`, …). It’s regex-based — useful signal, not a formal audit. |
 | **Retry one model** | Resend without rerunning the whole batch. |
-| **Continue chat** | Pick up a thread with a model after the first reply - when it makes sense (no chat on hard errors or empty bodies). |
+| **Continue chat** | Pick up a thread with a model after the first reply — when it makes sense (no chat on hard errors or empty bodies). |
 | **Compare runs** | Put two runs side by side and spot what flipped. |
 | **Prompt library** | Save templates and labels in **your browser** (`localStorage`). |
-| **Export** | JSON, Markdown, CSV - plus on **mobile**, export defaults to **JSON** in one tap (full dropdown stays on desktop). |
+| **Export** | JSON, Markdown, CSV — plus on **mobile**, export defaults to **JSON** in one tap (full dropdown stays on desktop). |
 
 Optional screenshot (add when you have one):
 
@@ -41,9 +42,6 @@ Optional screenshot (add when you have one):
   <img src="docs/screenshot.png" alt="TEAMTESTHUB UI" width="720" />
 </p>
 -->
-
-<p align="center">
-</p>
 
 ---
 
@@ -65,7 +63,7 @@ npm install
 npm run dev
 ```
 
-Then open **http://localhost:5173** - paste your **OpenRouter** API key (`sk-or-v1-…`) and go.
+Then open **http://localhost:5173** — paste your **OpenRouter** API key (`sk-or-v1-…`) and go.
 
 Dev uses Vite’s **same-origin proxy** so browser calls don’t trip CORS; keep using `npm run dev`, don’t open raw `file://` HTML.
 
@@ -88,7 +86,7 @@ Upload **everything inside** `frontend/dist/` to your host (e.g. `index.html`, `
 prompt-testing-platform/
   frontend/
     src/           # React + TypeScript app
-    public/        # robots.txt, sitemap.xml, favicon - copied into dist/
+    public/        # robots.txt, sitemap.xml, favicon — copied into dist/
     dist/          # production output (npm run build), not always committed
     package.json
   backend/         # optional FastAPI stack (not required for the static OpenRouter UI)
@@ -114,5 +112,5 @@ The app talks to OpenRouter via a configurable API base (see `frontend` env / Vi
 ---
 
 <p align="center">
-  <sub>No cookies. Just prompts vs models.</sub>
+  <sub>No cookies. No drama. Just prompts vs models.</sub>
 </p>
