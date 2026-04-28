@@ -1,7 +1,21 @@
+import { useEffect, useState } from 'react'
 import clearKeyIcon from '../assets/icons/actions/clear5.png'
 import type { ApiKeySectionProps } from './types'
 
 export function ApiKeySection(props: ApiKeySectionProps) {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false,
+  )
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mediaQuery = window.matchMedia('(max-width: 768px)')
+    const handleChange = (event: MediaQueryListEvent) => setIsMobile(event.matches)
+    setIsMobile(mediaQuery.matches)
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
+
   const {
     theme,
     onToggleTheme,
@@ -19,8 +33,8 @@ export function ApiKeySection(props: ApiKeySectionProps) {
     <section className={`section ${keySaved ? 'section--compact' : ''}`}>
       <div className="section-header">
         <span className="section-num">1</span>
-        <h2>OpenRouter API Key</h2>
-        {keySaved && <span className="badge-ok section-header__status">✓ API key verified</span>}
+        <h2>{isMobile ? 'OpenRouter Key' : 'OpenRouter API Key'}</h2>
+        {keySaved && !isMobile && <span className="badge-ok section-header__status">✓ API key verified</span>}
         <div className="section-header__tools">
           {keySaved ? (
             <button
@@ -80,7 +94,7 @@ export function ApiKeySection(props: ApiKeySectionProps) {
               />
               <span>High privacy mode: forget key on page refresh.</span>
             </label>
-            <p className="hint">
+            <p className="hint api-key-section__dev-hint">
               Run the app with <code>npm run dev</code> so API calls work (same-origin proxy).
             </p>
           </div>

@@ -733,6 +733,7 @@ function App() {
   }
 
   const openContinueChat = (result: TestResult) => {
+    if (result.error || !result.response.trim()) return
     setActiveChatModelId(result.modelId)
     setChatInput('')
     setChatError('')
@@ -1283,8 +1284,13 @@ function App() {
             decoding="async"
           />
           <p className="site-footer__text">
-            © {new Date().getFullYear()} TEAMTESTHUB.US · All rights reserved · Privacy · Terms · No cookies. No
-            personal tracking. API keys never reach our server.
+            <span className="site-footer__mobile-only">
+              No cookies · TEAMTESTHUB.US · {new Date().getFullYear()} ©
+            </span>
+            <span className="site-footer__desktop-only">
+              © {new Date().getFullYear()} TEAMTESTHUB.US · All rights reserved · Privacy · Terms · No cookies. No personal
+              tracking. API keys never reach our server.
+            </span>
           </p>
         </div>
       </footer>

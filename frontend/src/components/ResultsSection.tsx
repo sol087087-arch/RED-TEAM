@@ -155,6 +155,9 @@ export function ResultsSection(props: ResultsSectionProps) {
   const [exportOpen, setExportOpen] = useState(false)
   const [lastExportKind, setLastExportKind] = useState<'csv' | 'json' | 'markdown' | 'all' | null>(null)
   const exportMenuRef = useRef<HTMLDivElement>(null)
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false,
+  )
 
   useEffect(() => {
     if (!exportOpen) return
@@ -165,6 +168,15 @@ export function ResultsSection(props: ResultsSectionProps) {
     document.addEventListener('pointerdown', onPointerDown, true)
     return () => document.removeEventListener('pointerdown', onPointerDown, true)
   }, [exportOpen])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mediaQuery = window.matchMedia('(max-width: 768px)')
+    const handleChange = (event: MediaQueryListEvent) => setIsMobile(event.matches)
+    setIsMobile(mediaQuery.matches)
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
 
   useEffect(() => {
     if (!exportOpen) return
@@ -217,12 +229,7 @@ export function ResultsSection(props: ResultsSectionProps) {
         <span className="section-num">4</span>
         <h2>Results</h2>
       </div>
-      <p className="hint">
-        <strong>Reply status</strong> (this app only): summary uses short labels; each card shows the exact type
-        next to latency (e.g. <em>block (hard)</em>, <em>block (w/ story)</em>). Re-run after rule changes; saved
-        badges update after re-test or clear.
-      </p>
-      {runHistory.length > 1 && (
+      {!isMobile && runHistory.length > 1 && (
         <div className="run-compare">
           <strong className="run-compare__title">Compare runs</strong>
           <div className="input-row run-compare__controls">
@@ -253,7 +260,7 @@ export function ResultsSection(props: ResultsSectionProps) {
           Please wait…
         </p>
       )}
-      {activeChatModelId && (
+      {activeChatModelId && !activeChatResult?.error && !!activeChatResult?.response.trim() && (
         <div className="chat-panel">
           <div className="chat-panel__header">
             <div className="chat-panel__title-wrap">
@@ -314,25 +321,36 @@ export function ResultsSection(props: ResultsSectionProps) {
       ) : (
         <>
           <div className="results-summary">
-            {passCount > 0 && (
-              <span className="badge-pass">
-                <span className="status-icon status-icon--pass">✓</span> {passCount} complied
-              </span>
-            )}
-            {blockCount > 0 && (
-              <span className="badge-fail">
-                <span className="status-icon status-icon--fail">✗</span> {blockCount} block
-              </span>
-            )}
-            {unknownCount > 0 && (
-              <span className="badge-unknown">? {unknownCount}</span>
-            )}
-            {errorCount > 0 && (
-              <span className="badge-error">
-                <span className="status-icon status-icon--error">⚠</span> {errorCount} {errorCount === 1 ? 'error' : 'errors'}
-              </span>
-            )}
-            <div className="export-buttons">
+            <div className="results-summary__badges">
+              {passCount > 0 && (
+                <span className="badge-pass">
+                  <span className="status-icon status-icon--pass">✓</span> {passCount} complied
+                </span>
+              )}
+              {blockCount > 0 && (
+                <span className="badge-fail">
+                  <span className="status-icon status-icon--fail">✗</span> {blockCount} block
+                </span>
+              )}
+              {unknownCount > 0 && (
+                <span className="badge-unknown">? {unknownCount}</span>
+              )}
+              {errorCount > 0 && (
+                <span className="badge-error">
+                  <span className="status-icon status-icon--error">⚠</span> {errorCount} {errorCount === 1 ? 'error' : 'errors'}
+                </span>
+              )}
+            </div>
+            <div className="export-buttons" role="group" aria-label="Results actions">
+              <button
+                type="button"
+                className="btn btn--match-action btn--icon-action clear-results-btn-mobile"
+                onClick={clearResults}
+                aria-label="Clear all results in this run"
+                title="Clear all results in this run"
+              >
+                <span className="response-action-icon response-action-icon--clear response-action-icon--btn-tone" aria-hidden="true" />
+              </button>
               <div
                 ref={exportMenuRef}
                 className={`export-menu${exportOpen ? ' export-menu--open' : ''}`}
@@ -340,15 +358,22 @@ export function ResultsSection(props: ResultsSectionProps) {
                 <button
                   type="button"
                   className="btn btn--match-action btn--icon-action export-menu__toggle"
-                  aria-label="Download report"
-                  title="Download report"
-                  aria-expanded={exportOpen}
-                  aria-haspopup="menu"
-                  onClick={() => setExportOpen(o => !o)}
+                  aria-label={isMobile ? 'Download JSON report' : 'Download report'}
+                  title={isMobile ? 'Download JSON report' : 'Download report'}
+                  aria-expanded={!isMobile ? exportOpen : undefined}
+                  aria-haspopup={!isMobile ? 'menu' : undefined}
+                  onClick={() => {
+                    if (isMobile) {
+                      setLastExportKind('json')
+                      exportJSON()
+                      return
+                    }
+                    setExportOpen(o => !o)
+                  }}
                 >
                   <span className="response-action-icon response-action-icon--download response-action-icon--btn-tone" aria-hidden="true" />
                 </button>
-                {exportOpen ? (
+                {!isMobile && exportOpen ? (
                   <div className="export-menu__panel" role="presentation">
                     <ul className="export-menu__menu" role="menu">
                       <li role="presentation">
@@ -441,15 +466,6 @@ export function ResultsSection(props: ResultsSectionProps) {
                   </div>
                 ) : null}
               </div>
-              <button
-                type="button"
-                className="btn btn--match-action btn--icon-action"
-                onClick={clearResults}
-                aria-label="Clear all results in this run"
-                title="Clear all results in this run"
-              >
-                <span className="response-action-icon response-action-icon--clear response-action-icon--btn-tone" aria-hidden="true" />
-              </button>
             </div>
           </div>
 
@@ -482,11 +498,11 @@ export function ResultsSection(props: ResultsSectionProps) {
                     <h3>{result.modelName}</h3>
                     <div className="response-meta">
                     {[
-                      result.latencyMs !== null ? `${result.latencyMs}ms` : null,
+                      !isMobile && result.latencyMs !== null ? `${result.latencyMs}ms` : null,
                       replyStatusLine(result.status),
                       result.reason || null,
                       result.apiFinishReason ? `API finish: ${result.apiFinishReason}` : null,
-                      result.completionTokens != null ? `${result.completionTokens} completion tokens` : null,
+                      !isMobile && result.completionTokens != null ? `${result.completionTokens} completion tokens` : null,
                     ]
                       .filter(Boolean)
                       .join(' · ')}
@@ -495,7 +511,7 @@ export function ResultsSection(props: ResultsSectionProps) {
                   <div className="response-actions">
                     {!result.response.trim() ? (
                       <>
-                        {retryingModels.includes(result.modelId) ? (
+                        {!isMobile && retryingModels.includes(result.modelId) ? (
                           <span className="response-retry-label" aria-live="polite">
                             Retrying…
                           </span>
@@ -520,37 +536,41 @@ export function ResultsSection(props: ResultsSectionProps) {
                         </button>
                       </>
                     ) : null}
-                    <button
-                      type="button"
-                      className="copy-icon-btn copy-icon-btn--response"
-                      onClick={() => openContinueChat(result)}
-                      aria-label={`Continue chat with ${result.modelName}`}
-                      title="Continue chat"
-                    >
-                      <span className="response-action-icon response-action-icon--continue-chat" aria-hidden="true" />
-                    </button>
-                    <button
-                      type="button"
-                      className="copy-icon-btn copy-icon-btn--response"
-                      onClick={() =>
-                        copyText(
-                          result.error
-                            ? `Error: ${result.error}`
-                            : result.response.trim()
-                              ? result.response
-                              : '(empty response)',
-                          `result-${result.modelId}-${idx}`
-                        )
-                      }
-                      aria-label={`Copy output from ${result.modelName}`}
-                      title="Copy output"
-                    >
-                      {copiedKey === `result-${result.modelId}-${idx}` ? (
-                        '✓'
-                      ) : (
-                        <span className="response-action-icon response-action-icon--copy" aria-hidden="true" />
-                      )}
-                    </button>
+                    {!result.error && !!result.response.trim() ? (
+                      <button
+                        type="button"
+                        className="copy-icon-btn copy-icon-btn--response"
+                        onClick={() => openContinueChat(result)}
+                        aria-label={`Continue chat with ${result.modelName}`}
+                        title="Continue chat"
+                      >
+                        <span className="response-action-icon response-action-icon--continue-chat" aria-hidden="true" />
+                      </button>
+                    ) : null}
+                    {(!isMobile || (!result.error && !!result.response.trim())) && (
+                      <button
+                        type="button"
+                        className="copy-icon-btn copy-icon-btn--response"
+                        onClick={() =>
+                          copyText(
+                            result.error
+                              ? `Error: ${result.error}`
+                              : result.response.trim()
+                                ? result.response
+                                : '(empty response)',
+                            `result-${result.modelId}-${idx}`
+                          )
+                        }
+                        aria-label={`Copy output from ${result.modelName}`}
+                        title="Copy output"
+                      >
+                        {copiedKey === `result-${result.modelId}-${idx}` ? (
+                          '✓'
+                        ) : (
+                          <span className="response-action-icon response-action-icon--copy" aria-hidden="true" />
+                        )}
+                      </button>
+                    )}
                   </div>
                 </header>
                 {result.error ? (

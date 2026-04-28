@@ -246,6 +246,10 @@ body {
   min-width: 0;
 }
 
+.site-header__text {
+  min-width: 0;
+}
+
 /* Branding PNGs: display at file resolution; alpha preserved; no dimming */
 .site-header__mark,
 .site-header__wordmark,
@@ -282,6 +286,14 @@ body {
   background: var(--page-bg);
   padding-top: 32px;
   padding-bottom: 3rem;
+}
+
+.site-footer__mobile-only {
+  display: none;
+}
+
+.site-footer__desktop-only {
+  display: inline;
 }
 
 .site-footer {
@@ -576,6 +588,10 @@ a:hover {
   margin: 0 0 0.45rem;
 }
 
+.api-key-section__intro .api-key-section__dev-hint {
+  margin-bottom: 0.9rem;
+}
+
 .api-key-section__form {
   margin: 0;
   width: 100%;
@@ -721,6 +737,10 @@ a:hover {
 
 .model-filter-presets {
   margin-top: 0.5rem;
+}
+
+.model-filter-hint-mobile {
+  margin: 0.35rem 0 0.45rem;
 }
 
 .input-row .filter-dropdown {
@@ -1409,12 +1429,22 @@ textarea {
 
 .results-summary {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: none;
+}
+
+.results-summary__badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .run-compare {
@@ -1604,11 +1634,13 @@ textarea {
 }
 
 .export-buttons {
-  display: flex;
-  flex-wrap: wrap;
+  display: inline-flex;
+  flex-wrap: nowrap;
   gap: 0.5rem;
-  margin-left: auto;
   align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  margin-left: 0;
 }
 
 .export-menu {
@@ -2182,13 +2214,41 @@ textarea {
     width: 100%;
   }
 
-  .export-buttons {
-    margin-left: 0;
+  .run-label-row .run-label-field {
+    flex: 0 0 auto;
     width: 100%;
   }
 
-  .export-buttons .btn {
-    flex: 1 1 auto;
+  .run-label-field__hint {
+    display: none;
+  }
+
+  .run-label-field input {
+    padding-right: 12px;
+  }
+
+  .results-summary .export-menu {
+    width: auto;
+  }
+
+  .export-buttons {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 40px;
+    min-width: 40px;
+    gap: 0.45rem;
+  }
+
+  .export-buttons .btn,
+  .export-buttons .export-menu__toggle,
+  .export-buttons .clear-results-btn-mobile {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px;
+    flex: 0 0 40px;
+    padding: 0;
   }
 
   .export-menu {
@@ -2201,6 +2261,147 @@ textarea {
     width: auto;
     max-width: none;
     border-radius: 0 0 var(--inner-radius) var(--inner-radius);
+  }
+}
+
+@media (max-width: 480px) {
+  .site-header__inner {
+    padding: 10px var(--pad-x);
+    gap: 0.6rem 1rem;
+    justify-content: center;
+  }
+
+  .site-header__illustration {
+    display: none;
+  }
+
+  /* Header PNGs must not force horizontal overflow on phones. */
+  .site-header__brand {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+  }
+
+  .site-header__mark {
+    width: 32px;
+    height: auto;
+    max-width: 32px;
+  }
+
+  .site-header__wordmark {
+    width: 100%;
+    height: auto;
+    /* Make the wordmark much smaller on phones */
+    max-width: min(66vw, 205px);
+  }
+
+  .site-header__subtitle {
+    display: none;
+  }
+
+  .site-footer__illustration {
+    display: none;
+  }
+
+  .site-footer__desktop-only {
+    display: none;
+  }
+
+  .site-footer__mobile-only {
+    display: inline;
+  }
+
+  .site-footer__inner {
+    justify-content: flex-end;
+  }
+
+  .site-footer__text {
+    margin-left: auto;
+    text-align: right;
+  }
+
+  /* API key input: keep a single-line, normal height on mobile */
+  .api-key-section__input {
+    height: 40px;
+    min-height: 40px;
+    padding: 0 12px;
+    line-height: 1.2;
+  }
+
+  .api-key-section__form .input-row {
+    align-items: center;
+  }
+
+  /* In column flex on mobile, inputs inherit `flex: 1 1 200px` which becomes HEIGHT.
+     Override for the API key field so it stays a single-line input, not a big box. */
+  .api-key-section__form .input-row .api-key-section__input {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .api-key-section__form .input-row .btn {
+    height: 40px;
+    min-height: 40px;
+  }
+
+  .input-row .model-filter-input {
+    height: 40px;
+    min-height: 40px;
+    max-height: 40px;
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 1.2;
+    flex: 0 0 40px;
+    width: 100%;
+  }
+
+  .input-row.input-row--model-filter-mobile {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+
+  .input-row.input-row--model-filter-mobile .model-filter-input {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+  }
+
+  .input-row.input-row--model-filter-mobile .model-filter-toggle-btn {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px;
+    flex: 0 0 40px;
+    padding: 0;
+  }
+
+  /* Results: prevent action buttons from forcing horizontal overflow. */
+  .response-header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: start;
+    column-gap: 0.6rem;
+    row-gap: 0.5rem;
+  }
+
+  .response-title {
+    grid-column: 2;
+    grid-row: 1;
+    flex: none;
+    min-width: 0;
+  }
+
+  .response-actions {
+    grid-column: 3;
+    grid-row: 1;
+    width: auto;
+    margin-left: 0;
+    justify-content: center;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-self: start;
   }
 }
 

@@ -178,19 +178,142 @@ export function stripModelPriceKeywords(filterRaw: string): string {
   return s.replace(/\s+/g, ' ').trim()
 }
 
+function tokenizeFilter(filterRaw: string): string[] {
+  return filterRaw
+    .toLowerCase()
+    .split(/[\s,.;:!?/|()[\]{}'"`]+/)
+    .map(t => t.trim())
+    .filter(Boolean)
+}
+
+function isSmallScaleToken(token: string): boolean {
+  return /^(small|tiny|lite|mini|compact|smol|маленьк|небольш|мини)$/i.test(token)
+}
+
+function isMediumScaleToken(token: string): boolean {
+  return /^(medium|mid|average|средн)/i.test(token)
+}
+
+function isLargeScaleToken(token: string): boolean {
+  return /^(large|big|huge|xl|giant|maxi|больш|крупн|огром)/i.test(token)
+}
+
+function isFreeToken(token: string): boolean {
+  return /^(free|gratis|бесплат|даром)$/i.test(token)
+}
+
+function isPaidToken(token: string): boolean {
+  return /^(paid|pay|paid-only|платн|коммер)/i.test(token)
+}
+
+function isPriceBandToken(token: string): 'economy' | 'standard' | 'premium' | null {
+  if (/^(economy|budget|cheap|эконом|дешев)/i.test(token)) return 'economy'
+  if (/^(standard|normal|balanced|обычн|стандарт)/i.test(token)) return 'standard'
+  if (/^(premium|pro|expensive|дорог|премиум)/i.test(token)) return 'premium'
+  return null
+}
+
+function tokenToProviderId(token: string): string | null {
+  const aliases: Record<string, string> = {
+    openai: 'openai',
+    gpt: 'openai',
+    anthropic: 'anthropic',
+    claude: 'anthropic',
+    cloud: 'anthropic',
+    meta: 'meta-llama',
+    llama: 'meta-llama',
+    'meta-llama': 'meta-llama',
+    google: 'google',
+    gemini: 'google',
+    mistral: 'mistralai',
+    mistralai: 'mistralai',
+    deepseek: 'deepseek',
+    xai: 'x-ai',
+    grok: 'x-ai',
+    cohere: 'cohere',
+    perplexity: 'perplexity',
+  }
+  return aliases[token] ?? null
+}
+
 export function filterAndSortModels(models: readonly Model[], filterRaw: string): Model[] {
   const trimmed = filterRaw.trim()
   if (!trimmed) return [...models]
 
+  const tokens = tokenizeFilter(trimmed)
   const priceSort = detectModelPriceSort(trimmed)
-  const textQuery = stripModelPriceKeywords(trimmed).toLowerCase()
+
+  const detectedProviders = new Set<string>()
+  let wantScale: ModelScaleBandFilter = 'all'
+  let wantMonetization: ModelMonetizationFilter = 'all'
+  let wantPriceBand: ModelPriceBandFilter = 'all'
+
+  const textTokens: string[] = []
+  for (const token of tokens) {
+    const provider = tokenToProviderId(token)
+    if (provider) {
+      detectedProviders.add(provider)
+      continue
+    }
+    if (isSmallScaleToken(token)) {
+      wantScale = 'small'
+      continue
+    }
+    if (isMediumScaleToken(token)) {
+      wantScale = 'medium'
+      continue
+    }
+    if (isLargeScaleToken(token)) {
+      wantScale = 'large'
+      continue
+    }
+    if (isFreeToken(token)) {
+      wantMonetization = 'free'
+      continue
+    }
+    if (isPaidToken(token)) {
+      wantMonetization = 'paid'
+      continue
+    }
+    const band = isPriceBandToken(token)
+    if (band) {
+      wantPriceBand = band
+      continue
+    }
+    textTokens.push(token)
+  }
 
   let list = [...models]
+  if (detectedProviders.size > 0) {
+    list = list.filter(m => detectedProviders.has(modelProviderId(m)))
+  }
+
+  if (wantMonetization === 'free') {
+    list = list.filter(isModelListedFree)
+  } else if (wantMonetization === 'paid') {
+    list = list.filter(m => !isModelListedFree(m))
+  }
+
+  if (wantScale !== 'all') {
+    list = list.filter(m => inferModelScaleBand(m) === wantScale)
+  }
+
+  if (wantPriceBand !== 'all') {
+    list = applyStructuredModelFilters(list, {
+      provider: 'all',
+      monetization: 'all',
+      scaleBand: 'all',
+      priceBand: wantPriceBand,
+    })
+  }
+
+  const textQuery = stripModelPriceKeywords(textTokens.join(' ')).toLowerCase()
   if (textQuery) {
-    list = list.filter(
-      m =>
-        m.id.toLowerCase().includes(textQuery) || m.name.toLowerCase().includes(textQuery)
-    )
+    const queryTokens = textQuery.split(/\s+/).filter(Boolean)
+    list = list.filter(m => {
+      const hay = `${m.id} ${m.name}`.toLowerCase()
+      return queryTokens.every(t => hay.includes(t))
+    })
   }
 
   if (priceSort && list.some(m => m.pricing != null)) {

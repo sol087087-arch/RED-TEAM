@@ -45,6 +45,9 @@ const REFUSAL_PATTERNS: RegExp[] = [
   /i\s+cannot\s+(?:give|provide)\s+you\s+(?:real|actual|working)\b/i,
   // Avoid broad false positives like "I will not disappoint."
   /i\s+(?:won'?t|will\s+not)\s+(?:help|assist|provide|create|comply|fulfill|engage|support|discuss|generate|answer|share|give|do|tell|show|reveal)\b/i,
+  // Handle compact typos like "I will notprovide that."
+  /i\s+will\s+not\s*provide\b/i,
+  /i\s+will\s+not\s*give\b/i,
   /i'?m\s+not\s+going\s+to\s+(?:help|assist|provide|create|comply|fulfill|engage|support|discuss|generate|answer|share|give|do|tell|show)\b/i,
   /i\s+(must|have\s+to)\s+(decline|refuse)/i,
   /refuse\s+to\s+(assist|help|provide|answer|comply|engage)/i,

@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   formatModelProviderLabel,
 } from '../features/models/filterModels'
@@ -16,6 +16,19 @@ import type { RunSetupSectionProps } from './types'
 import selectAllFilteredIcon from '../assets/icons/actions/select-all-filtered.png'
 
 export function RunSetupSection(props: RunSetupSectionProps) {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false,
+  )
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mediaQuery = window.matchMedia('(max-width: 768px)')
+    const handleChange = (event: MediaQueryListEvent) => setIsMobile(event.matches)
+    setIsMobile(mediaQuery.matches)
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
+
   const {
     keySaved,
     selectedModelsSize,
@@ -43,7 +56,6 @@ export function RunSetupSection(props: RunSetupSectionProps) {
     copiedKey,
     promptClassify,
     classifyLoading,
-    classifyUnavailable,
     setPrompt,
     runLabel,
     setRunLabelTouched,
@@ -69,8 +81,6 @@ export function RunSetupSection(props: RunSetupSectionProps) {
     temperatureMin,
     temperatureMax,
   } = props
-
-  if (!keySaved) return null
 
   const providerDropdownItems = useMemo<FilterDropdownItem[]>(
     () => [
@@ -174,12 +184,37 @@ export function RunSetupSection(props: RunSetupSectionProps) {
     [promptLibrary]
   )
 
+  const allFilteredSelected = filteredModels.length > 0 && filteredModels.every(model => selectedModels.has(model.id))
+
+  const handleMobileFilteredToggle = () => {
+    if (allFilteredSelected) {
+      clearSelection()
+      return
+    }
+    selectAllFiltered()
+  }
+
+  const shortClassifyText = useMemo(() => {
+    if (!promptClassify) return ''
+    const normalize = (s: string) => s.replace(/_/g, ' ').trim()
+    const capitalizeFirst = (s: string) => (s ? `${s.charAt(0).toUpperCase()}${s.slice(1)}` : s)
+    const parts: string[] = []
+    if (promptClassify.primary_category) parts.push(capitalizeFirst(normalize(promptClassify.primary_category)))
+    if (promptClassify.matched_rules.length > 0) parts.push(normalize(promptClassify.matched_rules[0]))
+    if (promptClassify.secondary_categories.length > 0) parts.push(`also ${normalize(promptClassify.secondary_categories[0])}`)
+    return parts.slice(0, 3).join(' · ')
+  }, [promptClassify])
+
+  if (!keySaved) return null
+
   return (
     <>
       <section className="section">
         <div className="section-header">
           <span className="section-num">2</span>
-          <h2>Select Models ({selectedModelsSize} selected / {totalModels} available)</h2>
+          <h2>
+            Select Models ({isMobile ? `${selectedModelsSize}/${totalModels}` : `${selectedModelsSize} selected / ${totalModels} available`})
+          </h2>
         </div>
         {modelsLoading ? (
           <p className="hint">Loading models...</p>
@@ -187,19 +222,20 @@ export function RunSetupSection(props: RunSetupSectionProps) {
           <p className="hint">No models loaded. Try refreshing or reverifying your key.</p>
         ) : (
           <>
-            <div className="input-row">
+            <div className={`input-row ${isMobile ? 'input-row--model-filter-mobile' : ''}`}>
               <input
                 type="text"
-                placeholder="Filter models (e.g. 'llama', 'cheap', 'claude')..."
+                className="model-filter-input"
+                placeholder="Filter models (e.g. 'cheap', 'economy', 'large', 'anthropic')..."
                 value={modelFilter}
                 onChange={(e) => setModelFilter(e.target.value)}
               />
               <button
                 type="button"
-                className="btn btn--match-action btn--icon-action"
-                onClick={selectAllFiltered}
+                className={`btn btn--match-action btn--icon-action ${isMobile ? 'model-filter-toggle-btn' : ''}`}
+                onClick={isMobile ? handleMobileFilteredToggle : selectAllFiltered}
                 aria-label="Select all filtered models"
-                title="Select all filtered"
+                title={isMobile ? (allFilteredSelected ? 'Clear selection' : 'Select all filtered') : 'Select all filtered'}
               >
                 <span
                   className="response-action-icon response-action-icon--select-all response-action-icon--btn-tone"
@@ -210,56 +246,69 @@ export function RunSetupSection(props: RunSetupSectionProps) {
                   aria-hidden="true"
                 />
               </button>
-              <button
-                type="button"
-                className="btn btn--match-action btn--icon-action"
-                onClick={clearSelection}
-                aria-label="Clear selected models"
-                title="Clear selected models"
-              >
-                <span className="response-action-icon response-action-icon--clear response-action-icon--btn-tone" aria-hidden="true" />
-              </button>
+              {!isMobile && (
+                <button
+                  type="button"
+                  className="btn btn--match-action btn--icon-action"
+                  onClick={clearSelection}
+                  aria-label="Clear selected models"
+                  title="Clear selected models"
+                >
+                  <span className="response-action-icon response-action-icon--clear response-action-icon--btn-tone" aria-hidden="true" />
+                </button>
+              )}
             </div>
-            <div className="input-row model-filter-presets">
-              <FilterDropdown
-                ariaLabel="Provider family"
-                buttonTitle="Namespace segment before / in the model id (OpenRouter provider scope). Full ids appear in the menu."
-                value={modelProviderFilter}
-                onChange={setModelProviderFilter}
-                items={providerDropdownItems}
-              />
-              <FilterDropdown
-                ariaLabel="Parameter scale"
-                buttonTitle={`Estimated size from model id/name (e.g. 7b, 70b, 8x7b MoE) and a few family keywords. OpenRouter does not list parameter counts. Cutoffs: small under ${SCALE_SMALL_MAX_B}B, medium ${SCALE_SMALL_MAX_B}–${SCALE_LARGE_MIN_B}B, large ${SCALE_LARGE_MIN_B}B+. Unclassified models are hidden when Small/Medium/Large is selected.`}
-                value={modelScaleBandFilter}
-                onChange={value =>
-                  setModelScaleBandFilter(value as 'all' | 'small' | 'medium' | 'large')
-                }
-                items={scaleDropdownItems}
-              />
-              <FilterDropdown
-                ariaLabel="Listed access cost"
-                buttonTitle="Based on listed USD rates in the catalog ($0 on both axes = free). Details in the menu."
-                value={modelMonetizationFilter}
-                onChange={value =>
-                  setModelMonetizationFilter(value as 'all' | 'free' | 'paid')
-                }
-                items={accessDropdownItems}
-              />
-              <FilterDropdown
-                ariaLabel="Output price tier"
-                buttonTitle={priceTierButtonTitle}
-                value={modelPriceBandFilter}
-                onChange={value =>
-                  setModelPriceBandFilter(value as 'all' | 'economy' | 'standard' | 'premium')
-                }
-                items={priceTierDropdownItems}
-              />
-            </div>
+            {isMobile && (
+              <p className="hint model-filter-hint-mobile">Try: cheap, economy, large, anthropic, cloud, free</p>
+            )}
+            {!isMobile && (
+              <div className="input-row model-filter-presets">
+                <FilterDropdown
+                  ariaLabel="Provider family"
+                  buttonTitle="Namespace segment before / in the model id (OpenRouter provider scope). Full ids appear in the menu."
+                  value={modelProviderFilter}
+                  onChange={setModelProviderFilter}
+                  items={providerDropdownItems}
+                />
+                <FilterDropdown
+                  ariaLabel="Parameter scale"
+                  buttonTitle={`Estimated size from model id/name (e.g. 7b, 70b, 8x7b MoE) and a few family keywords. OpenRouter does not list parameter counts. Cutoffs: small under ${SCALE_SMALL_MAX_B}B, medium ${SCALE_SMALL_MAX_B}–${SCALE_LARGE_MIN_B}B, large ${SCALE_LARGE_MIN_B}B+. Unclassified models are hidden when Small/Medium/Large is selected.`}
+                  value={modelScaleBandFilter}
+                  onChange={value =>
+                    setModelScaleBandFilter(value as 'all' | 'small' | 'medium' | 'large')
+                  }
+                  items={scaleDropdownItems}
+                />
+                <FilterDropdown
+                  ariaLabel="Listed access cost"
+                  buttonTitle="Based on listed USD rates in the catalog ($0 on both axes = free). Details in the menu."
+                  value={modelMonetizationFilter}
+                  onChange={value =>
+                    setModelMonetizationFilter(value as 'all' | 'free' | 'paid')
+                  }
+                  items={accessDropdownItems}
+                />
+                <FilterDropdown
+                  ariaLabel="Output price tier"
+                  buttonTitle={priceTierButtonTitle}
+                  value={modelPriceBandFilter}
+                  onChange={value =>
+                    setModelPriceBandFilter(value as 'all' | 'economy' | 'standard' | 'premium')
+                  }
+                  items={priceTierDropdownItems}
+                />
+              </div>
+            )}
             <div className="model-grid-shell">
               <div className="model-grid">
                 {filteredModels.map(model => {
                   const sizeLabel = formatModelParameterSizeLabel(model)
+                  const mobileMetaParts = [
+                    model.context_length ? `${model.context_length.toLocaleString()} CTX` : '',
+                    model.pricing
+                      ? formatUsdPerMillionOutputTokens(model.pricing.completionPerTokenUsd)
+                      : '',
+                  ].filter(Boolean)
                   return (
                     <label
                       key={model.id}
@@ -273,16 +322,22 @@ export function RunSetupSection(props: RunSetupSectionProps) {
                       <div className="model-body">
                         <div className="model-name">{model.name}</div>
                         <div className="model-meta">
-                          {model.id}
-                          {model.context_length
-                            ? ` · ${model.context_length.toLocaleString()} ctx`
-                            : ''}
-                          {sizeLabel ? ` · ${sizeLabel}` : ''}
-                          {model.pricing
-                            ? ` · ${formatUsdPerMillionOutputTokens(
-                                model.pricing.completionPerTokenUsd
-                              )}`
-                            : ''}
+                          {isMobile
+                            ? mobileMetaParts.join(' · ')
+                            : (
+                              <>
+                                {model.id}
+                                {model.context_length
+                                  ? ` · ${model.context_length.toLocaleString()} ctx`
+                                  : ''}
+                                {sizeLabel ? ` · ${sizeLabel}` : ''}
+                                {model.pricing
+                                  ? ` · ${formatUsdPerMillionOutputTokens(
+                                      model.pricing.completionPerTokenUsd
+                                    )}`
+                                  : ''}
+                              </>
+                              )}
                         </div>
                       </div>
                     </label>
@@ -315,21 +370,22 @@ export function RunSetupSection(props: RunSetupSectionProps) {
         {prompt.trim() && (
           <p className="hint prompt-classify" aria-live="polite">
             {promptClassify && (
-              <span>
-                <strong>Prompt heuristic</strong>: {promptClassify.primary_category} · rule match strength{' '}
-                {(100 * promptClassify.confidence).toFixed(0)}%
-                {promptClassify.secondary_categories.length > 0
-                  ? ` · also: ${promptClassify.secondary_categories.join(', ')}`
-                  : ''}
-                {promptClassify.matched_rules.length > 0
-                  ? ` · rules: ${promptClassify.matched_rules.join(', ')}`
-                  : ''}
-              </span>
+              isMobile ? (
+                <span>{shortClassifyText}</span>
+              ) : (
+                <span>
+                  <strong>Prompt heuristic</strong>: {promptClassify.primary_category} · rule match strength{' '}
+                  {(100 * promptClassify.confidence).toFixed(0)}%
+                  {promptClassify.secondary_categories.length > 0
+                    ? ` · also: ${promptClassify.secondary_categories.join(', ')}`
+                    : ''}
+                  {promptClassify.matched_rules.length > 0
+                    ? ` · rules: ${promptClassify.matched_rules.join(', ')}`
+                    : ''}
+                </span>
+              )
             )}
             {classifyLoading && <span>Classifying…</span>}
-            {!classifyLoading && classifyUnavailable && (
-              <span> · API unavailable, using local heuristic fallback.</span>
-            )}
           </p>
         )}
         <div className="scroll-fade-shell scroll-fade-shell--prompt">
@@ -357,91 +413,95 @@ export function RunSetupSection(props: RunSetupSectionProps) {
               maxLength={80}
             />
           </div>
-          <button
-            type="button"
-            className="btn btn--match-action btn--icon-action"
-            onClick={() => {
-              setRunLabelTouched(true)
-              setRunLabel(autoRunLabel(prompt, templateName, runLabel))
-            }}
-            disabled={!prompt.trim()}
-            aria-label="Regenerate run name"
-            title="Regenerate run name from heuristics"
-          >
-            <span className="response-action-icon response-action-icon--reload response-action-icon--btn-tone" aria-hidden="true" />
-          </button>
-        </div>
-        <div className="prompt-library">
-          <div className="prompt-library__title">Prompt library</div>
-          <p className="hint prompt-library__storage-note">
-            Saved only in this browser (localStorage on your device). It is not uploaded to TeamTestHub or any server we run.
-          </p>
-          <div className="input-row">
-            <div className="prompt-library__field">
-              <span className="prompt-library__field-hint">Prompt Name</span>
-              <input
-                type="text"
-                className="prompt-library__name-input"
-                value={templateName}
-                onChange={(e) => {
-                  setTemplateNameTouched(true)
-                  setTemplateName(e.target.value)
-                }}
-                placeholder="Prompt name"
-                maxLength={80}
-              />
-            </div>
-            <div className="prompt-library__field">
-              <span className="prompt-library__field-hint">Prompt Tags</span>
-              <input
-                type="text"
-                className="prompt-library__tags-input"
-                value={templateTagsInput}
-                onChange={(e) => {
-                  setTemplateTagsTouched(true)
-                  setTemplateTagsInput(e.target.value)
-                }}
-                placeholder="#prompt_tag, #roleplay, #jailbreak"
-                maxLength={160}
-              />
-            </div>
-            <button type="button" className="btn btn--action-fixed" onClick={savePromptTemplate}>
-              Save template
-            </button>
-          </div>
-          <div className="input-row prompt-library__row">
-            <FilterDropdown
-              ariaLabel="Saved prompt template"
-              buttonTitle="Templates are stored only in this browser. Open the menu for tags and details."
-              value={selectedTemplateId}
-              onChange={loadTemplateIntoPrompt}
-              items={templateDropdownItems}
-            />
+          {!isMobile && (
             <button
               type="button"
-              className="btn btn--mini-fixed btn--icon-action"
-              onClick={() => selectedTemplateId && loadTemplateIntoPrompt(selectedTemplateId)}
-              disabled={!selectedTemplateId}
-              aria-label="Load selected template"
-              title="Load selected template"
+              className="btn btn--match-action btn--icon-action"
+              onClick={() => {
+                setRunLabelTouched(true)
+                setRunLabel(autoRunLabel(prompt, templateName, runLabel))
+              }}
+              disabled={!prompt.trim()}
+              aria-label="Regenerate run name"
+              title="Regenerate run name from heuristics"
             >
-              <span className="response-action-icon response-action-icon--load response-action-icon--btn-tone" aria-hidden="true" />
+              <span className="response-action-icon response-action-icon--reload response-action-icon--btn-tone" aria-hidden="true" />
             </button>
-            <button
-              type="button"
-              className="btn btn--mini-fixed btn--icon-action"
-              onClick={deleteTemplate}
-              disabled={!selectedTemplateId}
-              aria-label="Delete selected template"
-              title="Delete selected template"
-            >
-              <span className="response-action-icon response-action-icon--clear response-action-icon--btn-tone" aria-hidden="true" />
-            </button>
-            <button type="button" className="btn btn--action-fixed" onClick={handleRunTests} disabled={!canRun}>
-              Run selected
-            </button>
-          </div>
+          )}
         </div>
+        {!isMobile && (
+          <div className="prompt-library">
+            <div className="prompt-library__title">Prompt library</div>
+            <p className="hint prompt-library__storage-note">
+              Saved only in this browser (localStorage on your device). It is not uploaded to TeamTestHub or any server we run.
+            </p>
+            <div className="input-row">
+              <div className="prompt-library__field">
+                <span className="prompt-library__field-hint">Prompt Name</span>
+                <input
+                  type="text"
+                  className="prompt-library__name-input"
+                  value={templateName}
+                  onChange={(e) => {
+                    setTemplateNameTouched(true)
+                    setTemplateName(e.target.value)
+                  }}
+                  placeholder="Prompt name"
+                  maxLength={80}
+                />
+              </div>
+              <div className="prompt-library__field">
+                <span className="prompt-library__field-hint">Prompt Tags</span>
+                <input
+                  type="text"
+                  className="prompt-library__tags-input"
+                  value={templateTagsInput}
+                  onChange={(e) => {
+                    setTemplateTagsTouched(true)
+                    setTemplateTagsInput(e.target.value)
+                  }}
+                  placeholder="#prompt_tag, #roleplay, #jailbreak"
+                  maxLength={160}
+                />
+              </div>
+              <button type="button" className="btn btn--action-fixed" onClick={savePromptTemplate}>
+                Save template
+              </button>
+            </div>
+            <div className="input-row prompt-library__row">
+              <FilterDropdown
+                ariaLabel="Saved prompt template"
+                buttonTitle="Templates are stored only in this browser. Open the menu for tags and details."
+                value={selectedTemplateId}
+                onChange={loadTemplateIntoPrompt}
+                items={templateDropdownItems}
+              />
+              <button
+                type="button"
+                className="btn btn--mini-fixed btn--icon-action"
+                onClick={() => selectedTemplateId && loadTemplateIntoPrompt(selectedTemplateId)}
+                disabled={!selectedTemplateId}
+                aria-label="Load selected template"
+                title="Load selected template"
+              >
+                <span className="response-action-icon response-action-icon--load response-action-icon--btn-tone" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="btn btn--mini-fixed btn--icon-action"
+                onClick={deleteTemplate}
+                disabled={!selectedTemplateId}
+                aria-label="Delete selected template"
+                title="Delete selected template"
+              >
+                <span className="response-action-icon response-action-icon--clear response-action-icon--btn-tone" aria-hidden="true" />
+              </button>
+              <button type="button" className="btn btn--action-fixed" onClick={handleRunTests} disabled={!canRun}>
+                Run selected
+              </button>
+            </div>
+          </div>
+        )}
         <div className="run-temperature-wrap">
           <div className="run-temperature-bar">
             <button
