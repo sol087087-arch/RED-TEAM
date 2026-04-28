@@ -8,7 +8,7 @@
 </pre>
 
 <p align="left">
-  ## <strong>T E A M T E S T H U B</strong><br />
+<strong>T E A M T E S T H U B</strong><br />
     <a href="https://teamtesthub.us"><strong>teamtesthub.us</strong></a>
 
 </p>
