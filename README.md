@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/PKief/vscode-material-icon-theme/master/icons/shield.svg" width="80" />
+
 </p>
 
 <h1 align="center">T E A M &nbsp; T E S T H U B</h1>
 
 <p align="center">
-  <a href="https://teamtesthub.us"><strong>🚀 teamtesthub.us</strong></a>
+  <a href="https://teamtesthub.us"><strong> teamtesthub.us</strong></a>
 </p>
 
 <p align="center">
@@ -43,7 +43,7 @@ Standard testing is slow. **TeamTestHub** is a shotgun blast to the face of LLM 
 
 ---
 
-### 🔒 Privacy First
+### Privacy First
 We don't want your data, and we definitely don't want your keys.
 - **Zero Backend:** The app is a collection of static files.
 - **Client-Side Keys:** Your OpenRouter API key stays in `sessionStorage`. 
@@ -51,7 +51,7 @@ We don't want your data, and we definitely don't want your keys.
 
 ---
 
-### 🚀 Getting Started
+### Getting Started
 
 **Run it locally**
 ```bash
