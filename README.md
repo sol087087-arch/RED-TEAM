@@ -1,6 +1,6 @@
 
 <p align="center">
-  <strong>T E A M &nbsp; T E S T &nbsp; H U B</strong><br />
+  <h1>T E A M &nbsp; T E S T &nbsp; H U B</h1><br />
   <sub>test · build · iterate</sub><br /><br />
   <a href="https://teamtesthub.us"><strong>teamtesthub.us</strong></a>
   &nbsp;·&nbsp;
