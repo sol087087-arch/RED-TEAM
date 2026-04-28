@@ -2,7 +2,7 @@
 <p align="left">
   <h1>T E A M  T E S T H U B</h1><br />
   <a href="https://teamtesthub.us"><strong>teamtesthub.us</strong></a>
-  &nbsp;·&nbsp;
+
 </p>
 
 <p align="left">
