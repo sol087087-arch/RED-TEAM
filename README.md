@@ -54,7 +54,7 @@ We don't want your data, and we definitely don't want your keys.
 ### Getting Started
 
 **Run it locally**
-```bash
+
 # Clone and enter the frontend
 cd frontend
 
@@ -69,7 +69,7 @@ Navigate to http://localhost:5173, paste your sk-or-v1-… key, and start testin
 Production Build
 Bash
 
-npm run build ```bash
+npm run build `
 
 Deploy the contents of frontend/dist/ to any static host (IONOS, Vercel, Netlify).
 Repository Structure
