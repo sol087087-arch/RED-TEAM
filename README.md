@@ -1,106 +1,39 @@
+# T E A M &nbsp; T E S T &nbsp; H U B
 
-<p align="left">
-  <h1>T E A M  T E S T H U B</h1><br />
-  <a href="https://teamtesthub.us"><strong>teamtesthub.us</strong></a>
+[**teamtesthub.us**](https://teamtesthub.us)
 
-</p>
-
-<p align="left">
-  <strong>Drop one prompt. Watch every model squirm (or comply).</strong><br />
-  Built for red teamers who are tired of copy-pasting the same prompt into twelve browser tabs — and for prompt engineers, researchers, and anyone who wants to know which models will actually do the thing.
-</p>
+**One prompt. Every model. Instant comparison.**  
+A streamlined platform for red teamers and prompt engineers to benchmark multiple LLMs simultaneously via OpenRouter.
 
 ---
 
-## What it does
+## Capabilities
 
-| | |
-|--|--|
-| **Parallel blast** | Send your prompt to every model you pick — **simultaneously**, each in isolation. |
-| **Live results** | Replies stream in as they arrive, with latency and a **pass / block / error** readout. |
-| **Refusal radar** | Heuristic detection across safety-ish refusals (explicit content, weapons, drugs, social engineering, “creative refusal theater”, typos like `notprovide`, …). It’s regex-based — useful signal, not a formal audit. |
-| **Retry one model** | Resend without rerunning the whole batch. |
-| **Continue chat** | Pick up a thread with a model after the first reply — when it makes sense (no chat on hard errors or empty bodies). |
-| **Compare runs** | Put two runs side by side and spot what flipped. |
-| **Prompt library** | Save templates and labels in **your browser** (`localStorage`). |
-| **Export** | JSON, Markdown, CSV — plus on **mobile**, export defaults to **JSON** in one tap (full dropdown stays on desktop). |
-
-Optional screenshot (add when you have one):
-
-<!-- Uncomment after adding `docs/screenshot.png`:
-<p align="center">
-  <img src="docs/screenshot.png" alt="TEAMTESTHUB UI" width="720" />
-</p>
--->
+| Feature | Details |
+| :--- | :--- |
+| **Parallel Execution** | Send prompts to multiple models at once in isolated sessions. |
+| **Real-time Metrics** | Streaming responses with latency tracking and Pass/Block/Error status. |
+| **Refusal Detection** | Heuristic-based monitoring for safety refusals and "creative theater." |
+| **Session Management** | Individual model retries and thread continuation (where supported). |
+| **Comparison Tools** | Side-by-side run analysis and local prompt library (localStorage). |
+| **Data Export** | Support for JSON, Markdown, and CSV formats. |
 
 ---
 
-## Privacy
+## Privacy & Security
 
-Your **OpenRouter API key never hits our servers**. It stays in **`sessionStorage`** for this tab/session (with optional “high privacy” so it isn’t kept across refreshes). Themes, templates, and last run metadata live in **`localStorage`**.  
+The application is served as static files. No user data is stored on our infrastructure.
 
-The deployed app is **static files** (e.g. `frontend/dist` on IONOS). No accounts, no backend required for the live tool.
-
-SEO helpers ship in the build: `robots.txt` and `sitemap.xml` under `frontend/public/` → copied to the site root.
+*   **API Keys:** Your OpenRouter key stays in `sessionStorage` and never touches our servers.
+*   **Persistence:** Prompt templates and themes are stored locally in your browser's `localStorage`.
+*   **Zero Backend:** No accounts or databases required for the core tool.
 
 ---
 
-## Run locally
+## Installation
 
+### Local Development
 ```bash
 cd frontend
 npm install
 npm run dev
-```
-
-Then open **http://localhost:5173** — paste your **OpenRouter** API key (`sk-or-v1-…`) and go.
-
-Dev uses Vite’s **same-origin proxy** so browser calls don’t trip CORS; keep using `npm run dev`, don’t open raw `file://` HTML.
-
----
-
-## Production build
-
-```bash
-cd frontend
-npm run build
-```
-
-Upload **everything inside** `frontend/dist/` to your host (e.g. `index.html`, `assets/`, `robots.txt`, `sitemap.xml`, favicon, …).
-
----
-
-## Repo layout
-
-```text
-prompt-testing-platform/
-  frontend/
-    src/           # React + TypeScript app
-    public/        # robots.txt, sitemap.xml, favicon — copied into dist/
-    dist/          # production output (npm run build), not always committed
-    package.json
-  backend/         # optional FastAPI stack (not required for the static OpenRouter UI)
-  README.md
-  logo*.png        # branding assets (also used in the site header)
-```
-
----
-
-## GitHub vs hosting
-
-| Goal | What to push / upload |
-|------|------------------------|
-| **GitHub** | Push this repo; ignore committing `frontend/dist` unless you deliberately version builds. |
-| **Static host** | Upload fresh **`frontend/dist`** after each `npm run build`. |
-
----
-
-## Production note
-
-The app talks to OpenRouter via a configurable API base (see `frontend` env / Vite config). In production, ensure **`/openrouter-api`** (or your chosen base) is proxied to **`https://openrouter.ai/api/v1`**, or set **`VITE_OPENROUTER_API_BASE`** to the correct URL your deployment exposes.
-
----
-
-<p align="center">
-  <sub>No cookies. No drama. Just prompts vs models.</sub>
-</p>
