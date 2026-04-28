@@ -10,7 +10,7 @@
 <p align="left">
   ## <strong>T E A M T E S T H U B</strong><br />
     <a href="https://teamtesthub.us"><strong>teamtesthub.us</strong></a>
-  &nbsp;·&nbsp;
+
 </p>
 
 <p align="left">
