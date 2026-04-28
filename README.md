@@ -1,7 +1,6 @@
 <p align="center">
-  <img src="logo12.png" alt="" width="56" height="56" />
-  <br />
-  <img src="logo_text12.png" alt="TEAMTESTHUB" width="260" />
+  <!-- GitHub strips most CSS on &lt;img&gt;, so we use an SVG with a dark fill behind the light logos. -->
+  <img src="readme-brand.svg" alt="TEAMTESTHUB" width="520" />
 </p>
 
 <p align="center">
