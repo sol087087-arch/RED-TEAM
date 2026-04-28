@@ -1,15 +1,23 @@
+<pre align="center">
+████████╗███████╗ █████╗ ███╗   ███╗████████╗███████╗███████╗████████╗
+╚══██╔══╝██╔════╝██╔══██╗████╗ ████║╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝
+   ██║   █████╗  ███████║██╔████╔██║   ██║   █████╗  ███████╗   ██║
+   ██║   ██╔══╝  ██╔══██║██║╚██╔╝██║   ██║   ██╔══╝  ╚════██║   ██║
+   ██║   ███████╗██║  ██║██║ ╚═╝ ██║   ██║   ███████╗███████║   ██║
+   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝   ╚═╝   ╚══════╝╚══════╝   ╚═╝
+</pre>
+
 <p align="center">
-  <!-- GitHub strips most CSS on &lt;img&gt;, so we use an SVG with a dark fill behind the light logos. -->
-  <img src="readme-brand.svg" alt="TEAMTESTHUB" width="520" />
+  <strong>T E A M &nbsp; T E S T &nbsp; H U B</strong><br />
+  <sub>test · build · iterate</sub><br /><br />
+  <a href="https://teamtesthub.us"><strong>teamtesthub.us</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://www.teamtesthub.us">www.teamtesthub.us</a>
 </p>
 
 <p align="center">
-  <strong>Drop one prompt. Watch every model squirm (or comply).</strong>
-</p>
-
-<p align="center">
-  Built for red teamers who are tired of copy-pasting the same prompt into twelve browser tabs.<br />
-  Also handy for prompt engineers, researchers, and anyone who wants to know which models will actually do the thing.
+  <strong>Drop one prompt. Watch every model squirm (or comply).</strong><br />
+  Built for red teamers who are tired of copy-pasting the same prompt into twelve browser tabs — and for prompt engineers, researchers, and anyone who wants to know which models will actually do the thing.
 </p>
 
 ---
