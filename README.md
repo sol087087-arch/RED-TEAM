@@ -5,9 +5,7 @@
 ### https://teamtesthub.us/
 
 </div>
-
 </p>
-
 <p align="left">
   <strong>Drop one prompt. Watch every model squirm (or comply).</strong><br />
   Built for red teamers who are tired of copy-pasting the same prompt into twelve browser tabs - and for prompt engineers, researchers, and anyone who wants to know which models will actually do the thing.
