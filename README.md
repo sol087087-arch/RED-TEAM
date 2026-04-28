@@ -21,7 +21,7 @@
 
 ---
 
-### ⚡ The Workflow
+### The Workflow
 Standard testing is slow. **TeamTestHub** is a shotgun blast to the face of LLM safety layers.
 
 - **Parallel Blast:** Send one prompt to an entire fleet of models simultaneously.
@@ -31,7 +31,7 @@ Standard testing is slow. **TeamTestHub** is a shotgun blast to the face of LLM 
 
 ---
 
-### 🛠️ Feature Set
+### Feature Set
 
 | Feature | Description |
 | :--- | :--- |
@@ -69,10 +69,10 @@ Navigate to http://localhost:5173, paste your sk-or-v1-… key, and start testin
 Production Build
 Bash
 
-npm run build
+npm run build```
 
 Deploy the contents of frontend/dist/ to any static host (IONOS, Vercel, Netlify).
-📂 Repository Structure
+Repository Structure
 Plaintext
 
 prompt-testing-platform/
@@ -83,7 +83,7 @@ prompt-testing-platform/
 ├── backend/           # Optional FastAPI stack
 └── logo*.png          # Branding assets
 
-🌐 Deployment Configuration
+Deployment Configuration
 
 The app interfaces with OpenRouter via a configurable API base.
 
