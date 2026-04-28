@@ -12,7 +12,6 @@
   <sub>test · build · iterate</sub><br /><br />
   <a href="https://teamtesthub.us"><strong>teamtesthub.us</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://www.teamtesthub.us">www.teamtesthub.us</a>
 </p>
 
 <p align="center">
