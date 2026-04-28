@@ -1,0 +1,62 @@
+[
+  {
+    "id": "chemical_substances",
+    "category": "harmful_chemical",
+    "tags": ["substance", "chemical"],
+    "pattern": "\\b(lsd|meth|mdma|fentanyl|amphetamine|cyanide|ricin|sarin|vx|tannerite|thermite|napalm|chloroform|precursor|reagent|toxic|toxin|poison)\\b"
+  },
+  {
+    "id": "chemical_process",
+    "category": "harmful_chemical",
+    "tags": ["synthesis", "instructions"],
+    "pattern": "\\b(synthes(e|is|ize)|cook(ing)?|precursor|reagent|how to make|manufacture|extract|laboratory|synthesis|recipe for)\\b"
+  },
+  {
+    "id": "weapons_ied",
+    "category": "harmful_weapons",
+    "tags": ["explosive", "bomb"],
+    "pattern": "\\b(pipe bomb|molotov|ied|improvised explosive|detonator|build a bomb|make a bomb|tnt|dynamite|blasting|shaped charge|explosive|blast charge)\\b"
+  },
+  {
+    "id": "fire_incendiary",
+    "category": "harmful_fire_incendiary",
+    "tags": ["incendiary"],
+    "pattern": "\\b(molotov|napalm|thermite|incendiary|napalm)\\b"
+  },
+  {
+    "id": "cyber_abuse",
+    "category": "harmful_cyber",
+    "tags": ["malware", "hacking"],
+    "pattern": "\\b(malware|ransomware|phishing|keylogger|exploit|reverse shell|xss|sql injection|ddos|botnet|brute force|crack password)\\b"
+  },
+  {
+    "id": "self_harm",
+    "category": "harmful_self_harm",
+    "tags": ["self_harm"],
+    "pattern": "\\b(suicid|kill myself|self[- ]?harm|overdose|cut (my|your) wrists)\\b"
+  },
+  {
+    "id": "sexual",
+    "category": "sexual_content",
+    "tags": ["nsfw", "adult"],
+    "pattern": "\\b(nsfw|porn|erotic|penetration|blow ?job|cum|orgasm|smut|explicit scene|xxx)\\b"
+  },
+  {
+    "id": "pron_porn_typo",
+    "category": "sexual_content",
+    "tags": ["typo", "porn_intent"],
+    "pattern": "\\b(porn|pr0n|pron)\\b"
+  },
+  {
+    "id": "roleplay_persona",
+    "category": "roleplay",
+    "tags": ["persona", "in_character"],
+    "pattern": "\\b(roleplay|role[- ]?play|you are (a|an|the)|act as|pretend to be|in character|persona:)\\b"
+  },
+  {
+    "id": "biological",
+    "category": "harmful_biological",
+    "tags": ["pathogen"],
+    "pattern": "\\b(anthrax|botulin|smallpox|plague|pathogen|grow bacteria|culture of)\\b"
+  }
+]
