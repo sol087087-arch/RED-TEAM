@@ -1,16 +1,4 @@
-<div align="center">
-
-# <span style="color:white; background:black; padding:10px 20px; display:inline-block; letter-spacing:6px;">
-TEAMTESTHUB
-</span>
-
-### https://teamtesthub.us/
-
-</div>
-
----
-
-## What it does
+<div align="left"> # TEAMTESTHUB ### https://teamtesthub.us/ </div> </p> <p align="left"> <strong>Drop one prompt. Watch every model squirm (or comply).</strong><br /> Built for red teamers who are tired of copy-pasting the same prompt into twelve browser tabs - and for prompt engineers, researchers, and anyone who wants to know which models will actually do the thing. </p> --- ## What it does
 
 | | |
 |--|--|
