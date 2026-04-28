@@ -1,13 +1,12 @@
 
-<p align="center">
-  <h1>T E A M &nbsp; T E S T &nbsp; H U B</h1><br />
+<p align="left">
+  <h1>T E A M  T E S T H U B</h1><br />
   <sub>test · build · iterate</sub><br /><br />
   <a href="https://teamtesthub.us"><strong>teamtesthub.us</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://www.teamtesthub.us">www.teamtesthub.us</a>
 </p>
 
-<p align="center">
+<p align="left">
   <strong>Drop one prompt. Watch every model squirm (or comply).</strong><br />
   Built for red teamers who are tired of copy-pasting the same prompt into twelve browser tabs — and for prompt engineers, researchers, and anyone who wants to know which models will actually do the thing.
 </p>
