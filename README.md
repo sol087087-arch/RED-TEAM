@@ -43,7 +43,6 @@ Optional screenshot (add when you have one):
 -->
 
 <p align="center">
-  <img src="skull12.png" alt="" width="48" />
 </p>
 
 ---
@@ -115,5 +114,5 @@ The app talks to OpenRouter via a configurable API base (see `frontend` env / Vi
 ---
 
 <p align="center">
-  <sub>No cookies. No drama. Just prompts vs models.</sub>
+  <sub>No cookies. Just prompts vs models.</sub>
 </p>
