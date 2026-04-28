@@ -2,7 +2,7 @@
 
 </p>
 
-<h1 align="center">T E A M &nbsp; T E S T H U B</h1>
+<h1 align="center">T E A M &nbsp; T E S T &nbsp; H U B</h1>
 
 <p align="center">
   <a href="https://teamtesthub.us"><strong> teamtesthub.us</strong></a>
@@ -69,7 +69,7 @@ Navigate to http://localhost:5173, paste your sk-or-v1-… key, and start testin
 Production Build
 Bash
 
-npm run build```
+npm run build ```bash
 
 Deploy the contents of frontend/dist/ to any static host (IONOS, Vercel, Netlify).
 Repository Structure
