@@ -1,7 +1,6 @@
-<div align="center">
+<div align="left">
 
 # TEAMTESTHUB
-
 ### https://teamtesthub.us/
 
 </div>
