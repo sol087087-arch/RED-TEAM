@@ -1,5 +1,4 @@
 <p align="center">
-  <img src="logo.png" alt="TeamTestHub Logo" width="120" />
 </p>
 
 <h1 align="center">T E A M &nbsp; T E S T &nbsp; H U B</h1>
@@ -102,5 +101,5 @@ VITE_OPENROUTER_API_BASE=https://openrouter.ai/api/v1
 ---
 
 ### License
+MIT © TeamTestHub
 
-Add a `LICENSE` file in the repository root when you choose terms for this project.
