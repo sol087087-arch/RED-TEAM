@@ -10,13 +10,13 @@
 
 <p align="center">
   <strong>Drop one prompt. Watch every model squirm (or comply).</strong><br />
-  Built for red teamers, prompt engineers, and researchers who are tired of the "twelve-tab dance." 
+  Built for red teamers, prompt engineers, and researchers who are tired of the "twelve-tab dance."
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Security-Red_Teaming-red?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Focus-Privacy-blue?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Powered_by-OpenRouter-black?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Security-Red_Teaming-red?style=for-the-badge" alt="Security: Red Teaming" />
+  <img src="https://img.shields.io/badge/Focus-Privacy-blue?style=for-the-badge" alt="Focus: Privacy" />
+  <img src="https://img.shields.io/badge/Powered_by-OpenRouter-black?style=for-the-badge" alt="Powered by OpenRouter" />
 </p>
 
 ---
@@ -49,7 +49,7 @@ Standard testing is slow. **TeamTestHub** is a shotgun blast to the face of LLM 
 We don't want your data, and we definitely don't want your keys.
 
 - **Zero Backend:** The app is a collection of static files.
-- **Client-Side Keys:** Your OpenRouter API key stays in `sessionStorage`. 
+- **Client-Side Keys:** Your OpenRouter API key stays in `sessionStorage`.
 - **No Cookies:** No tracking, no drama, no telemetry.
 
 ---
@@ -59,40 +59,48 @@ We don't want your data, and we definitely don't want your keys.
 #### Run it locally
 
 ```bash
-# Clone and enter the frontend
-git clone https://github.com/yourusername/prompt-testing-platform.git
-cd prompt-testing-platform/frontend
+git clone https://github.com/sol087087-arch/RED-TEAM.git
+cd RED-TEAM/frontend
 
-# Install dependencies
 npm install
-
-# Launch the lab
 npm run dev
-Navigate to http://localhost:5173, paste your sk-or-v1-… key, and start testing.
-Production Build
-bash
+```
 
+Navigate to **http://localhost:5173**, paste your `sk-or-v1-…` key, and start testing.
+
+#### Production build
+
+From the repository root (the folder that contains `frontend/`):
+
+```bash
+cd frontend
 npm run build
+```
 
-Deploy the contents of frontend/dist/ to any static host (IONOS, Vercel, Netlify, AWS S3, etc.).
-Repository Structure
-text
+Deploy the contents of **`frontend/dist/`** to any static host (IONOS, Vercel, Netlify, AWS S3, etc.).
 
-prompt-testing-platform/
+---
+
+### Repository structure
+
+```text
+RED-TEAM/
 ├── frontend/
 │   ├── src/           # React + TypeScript core
 │   ├── public/        # SEO & static assets
 │   └── dist/          # Production output
 ├── backend/           # Optional FastAPI stack (if needed)
 └── logo*.png          # Branding assets
+```
 
 Environment variable for production:
-bash
 
+```bash
 VITE_OPENROUTER_API_BASE=https://openrouter.ai/api/v1
+```
 
-License
+---
 
-MIT © TeamTestHub
+### License
 
-Happy red teaming! 🚀
+Add a `LICENSE` file in the repository root when you choose terms for this project.
