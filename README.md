@@ -1,11 +1,11 @@
 <p align="center">
-
+  <img src="logo.png" alt="TeamTestHub Logo" width="120" />
 </p>
 
 <h1 align="center">T E A M &nbsp; T E S T &nbsp; H U B</h1>
 
 <p align="center">
-  <a href="https://teamtesthub.us"><strong> teamtesthub.us</strong></a>
+  <a href="https://teamtesthub.us"><strong>teamtesthub.us</strong></a>
 </p>
 
 <p align="center">
@@ -22,10 +22,11 @@
 ---
 
 ### The Workflow
+
 Standard testing is slow. **TeamTestHub** is a shotgun blast to the face of LLM safety layers.
 
 - **Parallel Blast:** Send one prompt to an entire fleet of models simultaneously.
-- **Refusal Radar:** Heuristic detection for "Creative Refusal Theater" (e.g., `notprovide`, `policy`, `safety`).
+- **Refusal Radar:** Heuristic detection for "Creative Refusal Theater" (e.g., `cannot provide`, `against policy`, `safety guidelines`).
 - **Live Stream:** Real-time replies with latency tracking and pass/block status.
 - **Compare & Contrast:** Side-by-side analysis to see which model's guardrails flipped first.
 
@@ -44,7 +45,9 @@ Standard testing is slow. **TeamTestHub** is a shotgun blast to the face of LLM 
 ---
 
 ### Privacy First
+
 We don't want your data, and we definitely don't want your keys.
+
 - **Zero Backend:** The app is a collection of static files.
 - **Client-Side Keys:** Your OpenRouter API key stays in `sessionStorage`. 
 - **No Cookies:** No tracking, no drama, no telemetry.
@@ -53,40 +56,43 @@ We don't want your data, and we definitely don't want your keys.
 
 ### Getting Started
 
-**Run it locally**
+#### Run it locally
 
+```bash
 # Clone and enter the frontend
-cd frontend
+git clone https://github.com/yourusername/prompt-testing-platform.git
+cd prompt-testing-platform/frontend
 
 # Install dependencies
 npm install
 
 # Launch the lab
 npm run dev
-
 Navigate to http://localhost:5173, paste your sk-or-v1-… key, and start testing.
-
 Production Build
-Bash
+bash
 
-npm run build `
+npm run build
 
-Deploy the contents of frontend/dist/ to any static host (IONOS, Vercel, Netlify).
+Deploy the contents of frontend/dist/ to any static host (IONOS, Vercel, Netlify, AWS S3, etc.).
 Repository Structure
-Plaintext
+text
 
 prompt-testing-platform/
 ├── frontend/
 │   ├── src/           # React + TypeScript core
 │   ├── public/        # SEO & static assets
 │   └── dist/          # Production output
-├── backend/           # Optional FastAPI stack
+├── backend/           # Optional FastAPI stack (if needed)
 └── logo*.png          # Branding assets
 
-Deployment Configuration
+Environment variable for production:
+bash
 
-The app interfaces with OpenRouter via a configurable API base.
+VITE_OPENROUTER_API_BASE=https://openrouter.ai/api/v1
 
-    Dev: Uses Vite’s same-origin proxy to bypass CORS.
+License
 
-    Prod: Ensure /openrouter-api proxies to https://openrouter.ai/api/v1 or set VITE_OPENROUTER_API_BASE in your environment.
+MIT © TeamTestHub
+
+Happy red teaming! 🚀
