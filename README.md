@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" alt="TeamTestHub Logo" width="120" />
+  <img src="logo.png" alt="TeamTestHub Logo" width="80" />
 </p>
 
 <h1 align="center">T E A M &nbsp; T E S T &nbsp; H U B</h1>
@@ -103,7 +103,3 @@ prompt-testing-platform/
 ```
 
 ---
-
-### License
-
-Add a `LICENSE` file at the repository root when you choose terms for this project.
