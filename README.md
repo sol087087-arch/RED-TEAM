@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" alt="TeamTestHub Logo" width="60" />
+  <img src="logo.png" alt="TeamTestHub Logo" width="70" />
 </p>
 
 <h1 align="center">T E A M &nbsp; T E S T &nbsp; H U B</h1>
