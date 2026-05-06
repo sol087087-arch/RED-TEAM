@@ -3,7 +3,6 @@ export function FirstPagePreview() {
     <section className="landing-preview" aria-hidden>
       <article className="landing-preview__card">
         <div className="section-header">
-          <span className="section-num">2</span>
           <h2>Select Models</h2>
         </div>
         <p className="hint">Filter catalog, pick targets, and run tests in parallel.</p>
@@ -16,7 +15,6 @@ export function FirstPagePreview() {
 
       <article className="landing-preview__card">
         <div className="section-header">
-          <span className="section-num">3</span>
           <h2>Prompt + Run Controls</h2>
         </div>
         <p className="hint">Compose prompt, set run name, use the prompt library, tune temperature, start run.</p>
@@ -29,7 +27,6 @@ export function FirstPagePreview() {
 
       <article className="landing-preview__card">
         <div className="section-header">
-          <span className="section-num">4</span>
           <h2>Results + Export</h2>
         </div>
         <p className="hint">See live responses, continue chat, compare runs, and export reports.</p>

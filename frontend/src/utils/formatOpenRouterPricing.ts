@@ -7,7 +7,7 @@ function maxFracForPerMillion(perMillion: number): number {
 
 /** Currency figure only (USD per 1M output tokens), for ranges. */
 export function formatUsdPerMOutputFigure(perTokenUsd: number): string {
-  if (!Number.isFinite(perTokenUsd) || perTokenUsd < 0) return '—'
+  if (!Number.isFinite(perTokenUsd) || perTokenUsd < 0) return '-'
   if (perTokenUsd === 0) return '$0'
   const perMillion = perTokenUsd * 1e6
   const maxFrac = maxFracForPerMillion(perMillion)
@@ -39,7 +39,7 @@ export function listedExchangeCostUsd(model: {
 }
 
 export function formatExchangeUsdFigure(n: number): string {
-  if (!Number.isFinite(n)) return '—'
+  if (!Number.isFinite(n)) return '-'
   const v = Math.max(0, n)
   if (v === 0) return '$0'
   const maxFrac = v < 0.01 ? 4 : v < 1 ? 3 : v < 100 ? 2 : 2
@@ -53,7 +53,7 @@ export function formatExchangeUsdFigure(n: number): string {
 
 /** Tier dropdown (Standard / Premium): approximate cost per one prompt + one reply. */
 export function formatApproxExchangeUsdRange(lo: number, hi: number): string {
-  if (!Number.isFinite(lo) || !Number.isFinite(hi)) return '—'
+  if (!Number.isFinite(lo) || !Number.isFinite(hi)) return '-'
   const a = Math.max(0, Math.min(lo, hi))
   const b = Math.max(0, Math.max(lo, hi))
   if (a === b) return `≈ ${formatExchangeUsdFigure(a)}/msg`
@@ -62,7 +62,7 @@ export function formatApproxExchangeUsdRange(lo: number, hi: number): string {
 
 /** Economy tier: emphasize starting at $0 when the slice includes free/near-free listings. */
 export function formatEconomyTierApprox(lo: number, hi: number): string {
-  if (!Number.isFinite(lo) || !Number.isFinite(hi)) return '—'
+  if (!Number.isFinite(lo) || !Number.isFinite(hi)) return '-'
   const a = Math.max(0, Math.min(lo, hi))
   const b = Math.max(0, Math.max(lo, hi))
   const negligible = (x: number) => x <= 1e-12 || x < 5e-5
@@ -76,16 +76,16 @@ export function formatEconomyTierApprox(lo: number, hi: number): string {
 
 /** Retained for any $/M output displays outside tier dropdowns. */
 export function formatApproxOutputRangeUsdPerM(lo: number, hi: number): string {
-  if (!Number.isFinite(lo) || !Number.isFinite(hi)) return '—'
+  if (!Number.isFinite(lo) || !Number.isFinite(hi)) return '-'
   if (lo === hi) return `≈ ${formatUsdPerMillionOutputTokens(lo)}`
-  return `≈ ${formatUsdPerMOutputFigure(lo)}–${formatUsdPerMOutputFigure(hi)}/M out`
+  return `≈ ${formatUsdPerMOutputFigure(lo)}-${formatUsdPerMOutputFigure(hi)}/M out`
 }
 
 /**
  * OpenRouter lists USD prices per token as strings. Display as $/1M output tokens for readability.
  */
 export function formatUsdPerMillionOutputTokens(perTokenUsd: number): string {
-  if (!Number.isFinite(perTokenUsd) || perTokenUsd < 0) return '—'
+  if (!Number.isFinite(perTokenUsd) || perTokenUsd < 0) return '-'
   if (perTokenUsd === 0) return 'free'
   const perMillion = perTokenUsd * 1e6
   const maxFrac = maxFracForPerMillion(perMillion)

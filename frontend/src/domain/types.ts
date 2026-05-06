@@ -6,12 +6,21 @@ export interface ModelPricing {
   completionPerTokenUsd: number
 }
 
+/**
+ * From OpenRouter `GET /models` → `architecture.output_modalities`
+ * (text, image, video, audio, embeddings, etc.).
+ */
 export interface Model {
   id: string
   name: string
   context_length?: number
   /** Present when the models API returned parseable `pricing` (base tier if tiered). */
   pricing?: ModelPricing
+  /** When API exposes architecture; use for image/video/audio rows instead of name heuristics only. */
+  outputModalities?: string[]
+  description?: string
+  /** Position in `GET /models` `data` array (OpenRouter default listing order). */
+  listIndex?: number
 }
 
 export interface TestResult {
@@ -50,6 +59,21 @@ export interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
   ts: number
+}
+
+/** Shared transcript for multi-model chat; assistants tagged so each model sees prior replies. */
+export interface GroupChatMessage {
+  role: 'user' | 'assistant' | 'provider_error'
+  content: string
+  ts: number
+  /** When role is assistant or provider_error - which model this line refers to */
+  authorModelId?: string
+  authorModelName?: string
+  /**
+   * True when this line used an auto-picked listed-free OpenRouter model because the user
+   * sent without selecting models (UI shows OpenRouter “free route” branding).
+   */
+  authorViaFreeOpenRouter?: boolean
 }
 
 export interface PromptClassify {

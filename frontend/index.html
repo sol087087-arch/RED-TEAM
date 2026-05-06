@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:; media-src 'self' blob:; object-src 'none'; base-uri 'self'" />
     <meta
       name="description"
-      content="TeamTestHub — test prompts against multiple OpenRouter models in parallel. Compare replies, export runs. API keys stay in your browser."
+      content="TeamTestHub - test prompts against multiple OpenRouter models in parallel. Compare replies, export runs. API keys stay in your browser."
     />
     <link rel="canonical" href="https://teamtesthub.us/" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,14 +16,16 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <title>TEAMTESTHUB — Prompt Testing</title>
+    <title>TEAMTESTHUB - Prompt Testing</title>
   </head>
   <body>
     <script>
-      try {
-        var t = localStorage.getItem('teamtesthub_theme')
-        if (t === 'dark') document.documentElement.dataset.theme = 'dark'
-      } catch (e) {}
+      ;(function () {
+        try {
+          var t = localStorage.getItem('teamtesthub_theme')
+          if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t
+        } catch (e) {}
+      })()
     </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

@@ -1,54 +1,7 @@
 import type { PromptClassify } from '../../domain/types'
+import { classifyHarmTaxonomy, formatTaxonomyLabel } from './harmTaxonomy'
 
-const LOCAL_PROMPT_RULES: Array<{
-  id: string
-  category: string
-  tags: string[]
-  rx: RegExp
-}> = [
-  {
-    id: 'chemical_substances',
-    category: 'harmful_chemical',
-    tags: ['substance', 'chemical'],
-    rx: /\b(lsd|meth|mdma|fentanyl|amphetamine|cyanide|ricin|sarin|vx|napalm|thermite|toxin|poison)\b/i,
-  },
-  {
-    id: 'chemical_process',
-    category: 'harmful_chemical',
-    tags: ['synthesis', 'instructions'],
-    rx: /\b(synthes(e|is|ize)|how to make|manufacture|extract|reagent|precursor|recipe for)\b/i,
-  },
-  {
-    id: 'weapons_ied',
-    category: 'harmful_weapons',
-    tags: ['explosive', 'bomb'],
-    rx: /\b(pipe bomb|molotov|ied|detonator|build a bomb|make a bomb|explosive|blast charge)\b/i,
-  },
-  {
-    id: 'cyber_abuse',
-    category: 'harmful_cyber',
-    tags: ['malware', 'hacking'],
-    rx: /\b(malware|ransomware|phishing|keylogger|exploit|reverse shell|xss|sql injection)\b/i,
-  },
-  {
-    id: 'self_harm',
-    category: 'harmful_self_harm',
-    tags: ['self_harm'],
-    rx: /\b(suicid|kill myself|self[- ]?harm|overdose)\b/i,
-  },
-  {
-    id: 'sexual',
-    category: 'sexual_content',
-    tags: ['nsfw', 'adult'],
-    rx: /\b(nsfw|porn|pr0n|pron|erotic|smut|explicit scene|xxx)\b/i,
-  },
-  {
-    id: 'roleplay_persona',
-    category: 'roleplay',
-    tags: ['persona', 'in_character'],
-    rx: /\b(roleplay|role[- ]?play|act as|pretend to be|you are (a|an|the))\b/i,
-  },
-]
+export { formatTaxonomyLabel, HARM_TAXONOMY_LABELS } from './harmTaxonomy'
 
 const TEMPLATE_STOP_WORDS = new Set([
   'the', 'a', 'an', 'and', 'or', 'but', 'if', 'then',
@@ -127,49 +80,7 @@ const ARCHETYPES: Record<string, RegExp[]> = {
 type SemanticGraph = { WHO: string[]; WHAT: string[]; HOW: string[]; FRAME: string[] }
 
 export function classifyPromptLocal(promptText: string): PromptClassify {
-  const text = (promptText || '').trim()
-  if (!text) {
-    return {
-      primary_category: 'unknown',
-      confidence: 0,
-      scores: {},
-      secondary_categories: [],
-      tags: [],
-      matched_rules: [],
-    }
-  }
-
-  const scores: Record<string, number> = {}
-  const tags: string[] = []
-  const matchedRules: string[] = []
-  for (const rule of LOCAL_PROMPT_RULES) {
-    if (!rule.rx.test(text)) continue
-    scores[rule.category] = (scores[rule.category] ?? 0) + 1
-    tags.push(...rule.tags)
-    matchedRules.push(rule.id)
-  }
-
-  const entries = Object.entries(scores).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-  if (!entries.length) {
-    return {
-      primary_category: 'unknown',
-      confidence: 0,
-      scores: {},
-      secondary_categories: [],
-      tags: [],
-      matched_rules: [],
-    }
-  }
-
-  const [primary, primaryScore] = entries[0]
-  return {
-    primary_category: primary,
-    confidence: Math.min(primaryScore / 5, 1),
-    scores: Object.fromEntries(entries),
-    secondary_categories: entries.filter(([cat]) => cat !== primary).map(([cat]) => cat),
-    tags: Array.from(new Set(tags)),
-    matched_rules: matchedRules,
-  }
+  return classifyHarmTaxonomy(promptText)
 }
 
 function extractNgramPhrases(text: string, minN = 2, maxN = 4): string[] {
@@ -380,7 +291,10 @@ export function suggestTemplateMeta(
     topPhrases.find(p => p.includes('synthesis') || p.includes('step by step') || p.includes('instructions')) ||
     ''
 
-  const categoryCore = classification?.primary_category?.replace(/^harmful_/, '').replace(/_/g, ' ') || ''
+  const categoryCore =
+    classification?.primary_category && classification.primary_category !== 'unknown'
+      ? formatTaxonomyLabel(classification.primary_category)
+      : ''
   const mode = roleplay ? 'Roleplay' : jailbreak ? 'Jailbreak' : 'Instructional'
   const nameParts = [who, mode, frameMode, object, categoryCore]
     .filter(Boolean)
@@ -444,7 +358,7 @@ function inferRunMode(promptText: string, templateName: string): 'roleplay' | 'j
 
 /**
  * Short human-readable run name. Temperature and calendar date live in export JSON / MD
- * and in run history timestamps — not in the label string.
+ * and in run history timestamps - not in the label string.
  */
 export function autoRunLabel(promptText: string, templateName: string, currentLabel = ''): string {
   const trimmed = templateName.trim()

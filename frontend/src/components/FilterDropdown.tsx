@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 export type FilterDropdownItem = {
   value: string
-  /** Label on the closed trigger */
+  /** Label on the closed control */
   labelShort: string
   /** Label shown in the open menu */
   labelFull: string
@@ -17,6 +17,8 @@ export function FilterDropdown(props: {
   items: readonly FilterDropdownItem[]
   /** Extra class on the root (e.g. layout in a flex row) */
   className?: string
+  /** Extra class on the closed trigger (layout / chrome; keep select-like, not button-lift). */
+  triggerClassName?: string
 }) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
@@ -41,16 +43,19 @@ export function FilterDropdown(props: {
 
   const selected = props.items.find(i => i.value === props.value)
   const buttonLabel = selected?.labelShort ?? props.items[0]?.labelShort ?? ''
+  const menuItems = props.items.filter(it => it.value !== props.value)
 
   const rootClass = ['filter-dropdown', open ? 'filter-dropdown--open' : '', props.className ?? '']
     .filter(Boolean)
     .join(' ')
 
+  const triggerClass = ['filter-dropdown__trigger', props.triggerClassName ?? ''].filter(Boolean).join(' ')
+
   return (
     <div ref={rootRef} className={rootClass}>
       <button
         type="button"
-        className="filter-dropdown__trigger"
+        className={triggerClass}
         aria-label={props.ariaLabel}
         title={props.buttonTitle}
         aria-expanded={open}
@@ -62,7 +67,7 @@ export function FilterDropdown(props: {
       </button>
       {open ? (
         <ul className="filter-dropdown__menu" role="listbox">
-          {props.items.map(it => (
+          {menuItems.map(it => (
             <li key={it.value} role="presentation">
               <button
                 type="button"

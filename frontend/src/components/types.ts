@@ -10,6 +10,10 @@ export type ApiKeySectionProps = {
   clearKey: () => void
   highPrivacyMode: boolean
   setHighPrivacyMode: (value: boolean) => void
+  llmProviderId: string
+  setLlmProviderId: (value: string) => void
+  llmCustomBase: string
+  setLlmCustomBase: (value: string) => void
   keyInput: string
   setKeyInput: (value: string) => void
   handleSaveKey: () => Promise<void> | void
@@ -17,7 +21,6 @@ export type ApiKeySectionProps = {
 }
 
 export type RunSetupSectionProps = {
-  keySaved: boolean
   selectedModelsSize: number
   totalModels: number
   modelsLoading: boolean
@@ -39,6 +42,13 @@ export type RunSetupSectionProps = {
   selectedModels: Set<string>
   toggleModel: (modelId: string) => void
   prompt: string
+  mutationEnabled: boolean
+  setMutationEnabled: (value: boolean) => void
+  mutationPrompt: string
+  setMutationPrompt: (value: string) => void
+  mutationModelId: string
+  setMutationModelId: (value: string) => void
+  mutationModelOptions: readonly { id: string; name: string }[]
   copyText: (text: string, key: string) => Promise<void> | void
   copiedKey: string | null
   promptClassify: PromptClassify | null
@@ -71,7 +81,6 @@ export type RunSetupSectionProps = {
 }
 
 export type ResultsSectionProps = {
-  keySaved: boolean
   runHistory: RunSnapshot[]
   compareRunAId: string
   compareRunBId: string
@@ -110,4 +119,5 @@ export type ResultsSectionProps = {
   retryModelPrompt: (modelId: string) => void
   retryingModels: readonly string[]
   hasPromptToRetry: boolean
+  removeResultAt: (index: number) => void
 }

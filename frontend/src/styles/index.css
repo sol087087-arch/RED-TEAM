@@ -1,4 +1,4 @@
-/* TEAMTESTHUB — minimalist retro-utilitarian dashboard (spec tokens) */
+/* TEAMTESTHUB - minimalist retro-utilitarian dashboard (spec tokens) */
 
 :root {
   --header-bg: #939e7c;
@@ -9,14 +9,18 @@
   /* Outer shell (sections, error panel): 4px */
   --card-radius: 4px;
   --field-bg: #faf6ed;
-  /* Typing: API key, model filter, test prompt — pure white */
+  /* Typing: API key, model filter, test prompt - pure white */
   --input-bg: #ffffff;
+  /* Selected mode chip / theme-switch active half: one step brighter than --input-bg */
+  --chrome-current-fill: color-mix(in srgb, var(--header-bg) 5%, var(--input-bg));
   /* Inset keyline for model filter + test prompt */
   --input-frame-inner: #e2d5bf;
   --border: #c8b89b;
   --text: #5f5243;
   --text-secondary: #6b6255;
   --badge-circle: #8a755d;
+  /* Generic chatbot glyph (Simple Icons fallback / OpenAI proxy) - warm brown, darker than body text */
+  --provider-icon-fallback: color-mix(in srgb, var(--badge-circle) 62%, #2c2419);
   --header-text: #f4eedf;
   /* 1px rule under header: slightly darker than header bar */
   --header-edge: color-mix(in srgb, var(--header-bg) 88%, #000000);
@@ -25,9 +29,21 @@
   --btn-bg-hover: #beb999;
   --btn-bg-active: #939e7c;
   --btn-text: #5f5243;
-  /* Inner UI (buttons, fields, list panel, result cards, chips): 6px */
-  --inner-radius: 6px;
+  /* Inner UI (buttons, fields, list panel, result cards, chips): 4px (test) */
+  --inner-radius: 4px;
+  /* OpenAI / ChatGPT logo green — features/icons/chatgptIcon.ts */
+  --openai-brand-green: #10a37f;
+  /*
+    Save & Verify tint (light): same blend as 50% openai + 50% header sage, nudged warm (#e0cf7a).
+    Must be a plain color — nested color-mix() here breaks var() in some browsers.
+  */
+  --save-verify-wash: #6eaa7d;
   --focus: #8a755d;
+  /* Red Team ink (light): darker, closer to TeamTestHub brand fill for better contrast */
+  --redteam-ink: #6b6255;
+  --redteam-ink-hover: #5f5243;
+  --redteam-chevron-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%238f897d' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+  --redteam-check-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpath d='M1.5 5.5L4.5 8.5L10.5 1' fill='none' stroke='%238f897d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', 'Roboto Mono', monospace;
   --content-max: 1100px;
@@ -35,9 +51,17 @@
   --pad-x-mobile: 16px;
   /* Vertical rhythm between main column blocks (error strip, sections, preview) */
   --stack-gap: 16px;
+  /* Gap between controls in a horizontal `.input-row` (also the unit for Red Team card spacing) */
+  --input-row-gap: 0.5rem;
+  /* Space between Red Team section cards: 3× field-row gap */
+  --redteam-section-stack-gap: calc(3 * var(--input-row-gap));
+  /* Space from brand / masthead block to first main card: chat frame top Red Team “Select Models” top */
+  --chat-workspace-main-block-start-gap: 0.65rem;
+  /* Panel corner radius: Red Team `.section` cards and legacy `.composer-pill`. Chat shell uses 24px in `.chat-workspace__unified-chat-frame`. */
+  --chat-workspace-shell-radius: 20px;
   /* Vertical padding inside each model list row */
   --model-item-padding-y: 9px;
-  /* Gap between model response cards (.results-list) — reuse for FirstPagePreview cards */
+  /* Gap between model response cards (.results-list) - reuse for FirstPagePreview cards */
   --results-gap: 0.5rem;
   /* Inter: body + small UI; section titles + site tagline use --fs-header only */
   --fs: 14px;
@@ -50,13 +74,29 @@
   --card-drop-shadow: 0 4px 3px color-mix(in srgb, var(--card-border) 30%, transparent);
   /* Thin strip under header bar (decorative fade onto page bg) */
   --header-ground-glow: color-mix(in srgb, var(--card-border) 46%, transparent);
-  /* Header comet streaks: stay cream on olive bar; not tied to --card-bg (dark panels) */
-  --comet-glow: #faf6ed;
+  /* Comet streaks (light): dark brown — cream (#faf6ed) matched the page and disappeared */
+  --comet-glow: color-mix(in srgb, var(--text) 72%, #1c1612);
+  --app-comet-backdrop-opacity: 0.6;
   /* All filter/export popover panels (black-based; do not use --text or it inverts in dark) */
   --dropdown-panel-shadow: 0 4px 16px rgb(0 0 0 / 0.12);
+  /*
+    Chat composer shell (.unified-chat-frame): hairline edge + subtle lift.
+    Red Team `.section` cards reuse these for the same rim light / shadow as the input window.
+  */
+  --chat-shell-border: 1px solid color-mix(in srgb, var(--card-border) 92%, transparent);
+  --chat-shell-shadow: 0 1px 3px color-mix(in srgb, var(--text) 6%, transparent);
+  /* Red Team section cards: same stack as --chat-shell-shadow at 50% glow opacity. */
+  --chat-shell-shadow-redteam: 0 1px 3px color-mix(in srgb, var(--text) 3%, transparent);
+  /*
+    Red Team cards: inner vignette — same ink as chat message field (--input-bg), ~30px Gaussian-like blur
+    fading to transparent (color-mix peak strength; blur does the falloff).
+  */
+  --redteam-card-inset-shadow: inset 0 0 30px color-mix(in srgb, var(--input-bg) 55%, transparent);
+  /* Hover lift: ~3.5% vs former 5% (~30% gentler). */
+  --btn-hover-scale: 1.035;
 }
 
-/* Dark theme (warm olive / ink — same family as light UI) */
+/* Dark theme (warm olive / ink - same family as light UI) */
 [data-theme='dark'] {
   color-scheme: dark;
   --header-bg: #5a6348;
@@ -65,24 +105,51 @@
   --card-border: #4a4540;
   --field-bg: #2a2825;
   --input-bg: #2f2d2a;
+  --chrome-current-fill: color-mix(in srgb, #ffffff 8%, var(--input-bg));
   --input-frame-inner: #555045;
   --border: #5c564c;
   --text: #ede8df;
   --text-secondary: #b5aea3;
   --badge-circle: #a89880;
+  --provider-icon-fallback: color-mix(in srgb, var(--badge-circle) 58%, #000000);
   --header-text: #f4eedf;
   --btn-bg: #4d5242;
   --btn-bg-hover: #5d6352;
   --btn-bg-active: #6e7658;
   --btn-text: #f0ebe3;
   --focus: #c9bc9e;
-  --model-row-hover-bg: color-mix(in srgb, var(--header-bg) 32%, var(--input-bg));
+  --redteam-ink: #b3aca1;
+  --redteam-ink-hover: #ede8df;
+  --redteam-chevron-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%23b3aca1' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+  --redteam-check-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpath d='M1.5 5.5L4.5 8.5L10.5 1' fill='none' stroke='%23b3aca1' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --model-row-hover-bg:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, #e5a8be 12%, transparent) 0%,
+      color-mix(in srgb, #e5a8be 6%, transparent) 45%,
+      transparent 100%
+    ),
+    color-mix(in srgb, var(--header-bg) 32%, var(--input-bg));
   --model-row-selected-bg: color-mix(in srgb, var(--header-bg) 48%, var(--input-bg));
   --badge-ok-bg: color-mix(in srgb, var(--badge-circle) 38%, var(--card-bg));
   /* Darker lift shadow on dark page (avoid “inverted” light halo from card-border mix) */
   --card-drop-shadow: 0 4px 10px rgb(0 0 0 / 0.38);
   --header-ground-glow: rgb(0 0 0 / 0.35);
   --dropdown-panel-shadow: 0 4px 20px rgb(0 0 0 / 0.45);
+  --comet-glow: color-mix(in srgb, var(--header-text) 72%, var(--page-bg));
+  /* Save & Verify tint (dark): openai + dark header sage, slightly warmed — plain hex for var() */
+  --save-verify-wash-dark: #4d8f6e;
+  /* Match chat composer “halo” on dark (diffuse rim + depth — same language as prechat hover, at rest) */
+  --chat-shell-shadow:
+    0 1px 3px color-mix(in srgb, var(--text) 6%, transparent),
+    0 0 20px color-mix(in srgb, var(--text) 11%, transparent),
+    0 2px 10px color-mix(in srgb, #000 42%, transparent);
+  --chat-shell-shadow-redteam:
+    0 1px 3px color-mix(in srgb, var(--text) 3%, transparent),
+    0 0 20px color-mix(in srgb, var(--text) 5.5%, transparent),
+    0 2px 10px color-mix(in srgb, #000 21%, transparent);
+  /* Inner vignette: a touch softer % than light so the rim stays smooth. */
+  --redteam-card-inset-shadow: inset 0 0 30px color-mix(in srgb, var(--input-bg) 48%, transparent);
 }
 
 *,
@@ -110,15 +177,30 @@ body {
   min-height: 100vh;
 }
 
-/* ——— App shell — full viewport, column ——— */
+/* --- App shell - full viewport, column --- */
 .app {
+  position: relative;
+  isolation: isolate;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--page-bg);
 }
 
-/* ——— Top header — PNGs use intrinsic pixel size (no CSS scaling) ——— */
+/* Full-viewport comet layer (~60% opacity); sits behind header/main/footer */
+.app-comet-backdrop.comet-field.premium {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  min-height: 100vh;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+  opacity: var(--app-comet-backdrop-opacity);
+}
+
+/* --- Top header - PNGs use intrinsic pixel size (no CSS scaling) --- */
 .site-header {
   flex-shrink: 0;
   width: 100%;
@@ -127,7 +209,6 @@ body {
   box-shadow: var(--card-drop-shadow);
   position: relative;
   z-index: 5;
-  overflow: hidden;
 }
 
 .site-header::after {
@@ -154,14 +235,6 @@ body {
   z-index: 1;
 }
 
-.comet-field.premium {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  isolation: isolate;
-  z-index: 0;
-}
 
 .comet {
   position: absolute;
@@ -260,7 +333,7 @@ body {
   max-width: none;
   max-height: none;
   flex-shrink: 0;
-  /* Do not set object-fit or fixed width/height — avoid rescaling */
+  /* Do not set object-fit or fixed width/height - avoid rescaling */
 }
 
 .site-header__illustration {
@@ -279,8 +352,10 @@ body {
   font-weight: 400;
 }
 
-/* ——— Main: centered column, 32px below header ——— */
+/* --- Main: centered column, 32px below header --- */
 .site-main {
+  position: relative;
+  z-index: 1;
   flex: 1 0 auto;
   width: 100%;
   background: var(--page-bg);
@@ -343,7 +418,7 @@ body {
   gap: var(--stack-gap);
 }
 
-/* ——— Links ——— */
+/* --- Links --- */
 a {
   color: var(--text);
   font-weight: 500;
@@ -364,7 +439,7 @@ a:hover {
   font-family: var(--font-mono);
 }
 
-/* ——— Error banner (panel) ——— */
+/* --- Error banner (panel) --- */
 .error-banner {
   margin: 0;
   display: flex;
@@ -385,7 +460,7 @@ a:hover {
   min-width: 0;
 }
 
-/* ——— Cards / panels ——— */
+/* --- Cards / panels --- */
 .section {
   margin: 0;
   background: var(--card-bg);
@@ -417,23 +492,6 @@ a:hover {
   margin-bottom: 0;
 }
 
-.section-num {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
-  min-height: 28px;
-  border-radius: 50%;
-  background: var(--badge-circle);
-  color: var(--header-text);
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  line-height: 1;
-  font-family: var(--font);
-}
-
 .section-header h2 {
   margin: 0;
   font-size: var(--fs-header);
@@ -450,6 +508,8 @@ a:hover {
 .section-header__tools {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 0.45rem;
   margin-left: auto;
 }
@@ -519,11 +579,98 @@ a:hover {
   text-shadow: 0 1px 1px color-mix(in srgb, #000 35%, transparent);
 }
 
+/*
+  Circular control, diagonal split (☀ top-left / ☾ bottom-right).
+  Active hemisphere: --chrome-current-fill (slightly brighter than message field --input-bg).
+*/
+.theme-switch--diagonal {
+  --theme-switch-diameter: 34px;
+  width: var(--theme-switch-diameter);
+  min-width: var(--theme-switch-diameter);
+  height: var(--theme-switch-diameter);
+  min-height: var(--theme-switch-diameter);
+  border-radius: 50%;
+  padding: 0;
+  overflow: hidden;
+}
+
+.theme-switch--diagonal .theme-switch__thumb {
+  display: none;
+}
+
+.theme-switch--diagonal .theme-switch__stack--diagonal {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.theme-switch--diagonal .theme-switch__half--light,
+.theme-switch--diagonal .theme-switch__half--dark {
+  position: absolute;
+  inset: 0;
+  flex: unset;
+  min-height: 0;
+  margin: 0;
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* Hypotenuse from top-right → bottom-left: sun above, moon below */
+.theme-switch--diagonal .theme-switch__half--light {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 5px 0 0 6px;
+  box-sizing: border-box;
+  background: color-mix(in srgb, var(--text) 5%, var(--input-bg));
+  color: var(--text-secondary);
+}
+
+.theme-switch--diagonal .theme-switch__half--dark {
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 0 6px 5px 0;
+  box-sizing: border-box;
+  background: color-mix(in srgb, var(--text) 5%, var(--input-bg));
+  color: var(--text-secondary);
+}
+
+.theme-switch--diagonal[data-active='light'] .theme-switch__half--light,
+.theme-switch--diagonal[data-active='dark'] .theme-switch__half--dark {
+  background: var(--chrome-current-fill);
+  color: var(--header-text);
+  text-shadow: 0 1px 1px color-mix(in srgb, #000 35%, transparent);
+}
+
+.theme-switch--diagonal[data-active='light'] .theme-switch__half--dark,
+.theme-switch--diagonal[data-active='dark'] .theme-switch__half--light {
+  background: color-mix(in srgb, var(--text) 5%, var(--input-bg));
+  color: var(--text-secondary);
+  text-shadow: none;
+}
+
+.section-header__tools .theme-switch.theme-switch--diagonal.btn.btn--match-action.btn--icon-action {
+  width: var(--theme-switch-diameter);
+  min-width: var(--theme-switch-diameter);
+  height: var(--theme-switch-diameter);
+  min-height: var(--theme-switch-diameter);
+  border-radius: 50%;
+}
+
 .section-header__status {
   margin-left: 0.5rem;
 }
 
 .copy-icon-btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -534,24 +681,64 @@ a:hover {
   font-weight: 600;
   line-height: 1;
   color: var(--text);
-  background: color-mix(in srgb, var(--btn-bg) 42%, var(--field-bg));
-  border: 1px solid color-mix(in srgb, var(--text) 10%, var(--input-frame-inner));
-  border-radius: var(--inner-radius);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.12s ease, border-color 0.12s ease;
-}
-
-.copy-icon-btn:hover:not(:disabled) {
   background:
     linear-gradient(
       to top,
-      color-mix(in srgb, var(--header-bg) 56%, transparent) 0%,
-      color-mix(in srgb, var(--header-bg) 32%, transparent) 24%,
+      color-mix(in srgb, var(--save-verify-wash) 20%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash) 7%, transparent) 46%,
       transparent 100%
     ),
-    color-mix(in srgb, var(--btn-bg) 42%, var(--field-bg));
-  border-color: color-mix(in srgb, var(--header-bg) 28%, var(--input-frame-inner));
+    color-mix(in srgb, var(--text) 7%, var(--field-bg));
+  border: 1px solid color-mix(in srgb, var(--save-verify-wash) 18%, var(--card-border));
+  border-radius: var(--inner-radius);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 7%, transparent);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+[data-theme='dark'] .copy-icon-btn {
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--save-verify-wash-dark) 20%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash-dark) 7%, transparent) 46%,
+      transparent 100%
+    ),
+    color-mix(in srgb, var(--text) 20%, var(--input-bg));
+  border: 1px solid color-mix(in srgb, var(--save-verify-wash-dark) 18%, var(--card-border));
+}
+
+.copy-icon-btn:hover:not(:disabled) {
+  transform: scale(var(--btn-hover-scale));
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--text) 12%, transparent);
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--save-verify-wash) 27%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash) 10%, transparent) 44%,
+      transparent 100%
+    ),
+    color-mix(in srgb, var(--btn-bg) 34%, var(--input-bg));
+  border-color: color-mix(in srgb, var(--save-verify-wash) 32%, var(--card-border));
+}
+
+[data-theme='dark'] .copy-icon-btn:hover:not(:disabled) {
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--save-verify-wash-dark) 27%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash-dark) 10%, transparent) 44%,
+      transparent 100%
+    ),
+    color-mix(in srgb, var(--text) 26%, var(--input-bg));
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--text) 16%, transparent),
+    0 2px 10px color-mix(in srgb, #000 45%, transparent);
 }
 
 .copy-icon-btn:focus-visible {
@@ -588,8 +775,407 @@ a:hover {
   margin: 0 0 0.45rem;
 }
 
-.api-key-section__intro .api-key-section__dev-hint {
-  margin-bottom: 0.9rem;
+/* Red Team vs Chat - segmented control */
+.app-mode-segmented {
+  display: flex;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 0 0.35rem;
+  padding: 3px;
+  gap: 2px;
+  border-radius: var(--inner-radius);
+  border: 1px solid var(--input-frame-inner);
+  background: color-mix(in srgb, var(--field-bg) 88%, var(--page-bg));
+  box-sizing: border-box;
+}
+
+/* Same row as theme switch (section 1 header tools); height aligns with 40px theme pill */
+.app-mode-segmented--header {
+  width: auto;
+  max-width: min(228px, 42vw);
+  margin: 0;
+  height: 40px;
+  padding: 2px;
+  align-self: center;
+  flex-shrink: 1;
+}
+
+.app-mode-segmented--header .app-mode-segmented__tab {
+  height: 100%;
+  min-height: 0;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+.app-mode-segmented__tab {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  margin: 0;
+  padding: 0 12px;
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: calc(var(--inner-radius) - 3px);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.app-mode-segmented__tab:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--header-bg) 12%, transparent);
+}
+
+.app-mode-segmented__tab[aria-selected='true'] {
+  color: var(--text);
+  background: var(--input-bg);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--text) 10%, transparent);
+}
+
+/*
+  Shared “API capsule” chrome - masthead, section 1 tools, Save, triggers.
+  Pair with .workspace-ui-hover for the same lift animation everywhere.
+*/
+.chrome-pill-surface {
+  background: var(--input-bg);
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 7%, transparent);
+  color: var(--text);
+}
+
+.app-mode-segmented.chrome-pill-surface {
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  background: var(--input-bg);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 7%, transparent);
+}
+
+.section-header__tools .chrome-pill-surface.filter-dropdown__trigger,
+.section-header__tools .chrome-pill-surface.btn.theme-switch {
+  background: var(--input-bg);
+}
+
+.filter-dropdown__trigger.chrome-pill-surface {
+  border-color: color-mix(in srgb, var(--card-border) 85%, transparent);
+}
+
+.chrome-pill-surface.api-key-section__field-wrap,
+.chrome-pill-surface.chat-workspace__masthead-key-field-wrap {
+  display: flex;
+  padding: 0 10px 0 12px;
+  align-items: stretch;
+}
+
+.chrome-pill-surface.api-key-section__field-wrap {
+  border-radius: var(--inner-radius);
+  min-height: 40px;
+}
+
+.chrome-pill-surface.chat-workspace__masthead-key-field-wrap {
+  border-radius: 999px;
+  min-height: var(--masthead-toolbar-h, 34px);
+}
+
+.chrome-pill-surface.chat-workspace__masthead-key-field-wrap--with-save {
+  padding: 0;
+  overflow: hidden;
+}
+
+.chrome-pill-surface.chat-workspace__masthead-key-field-wrap--with-save .chat-workspace__masthead-key-input,
+.chat-workspace__masthead-key-field-wrap--with-save .chat-workspace__masthead-key-input {
+  padding-left: 12px;
+  padding-right: 6px;
+  border-radius: 999px 0 0 999px;
+}
+
+.chrome-pill-surface.api-key-section__field-wrap .api-key-section__input,
+.chrome-pill-surface.chat-workspace__masthead-key-field-wrap .chat-workspace__masthead-key-input,
+.chrome-pill-surface.chat-workspace__masthead-key-field-wrap .api-key-section__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.chrome-pill-surface.chat-workspace__masthead-key-field-wrap:not(.chat-workspace__masthead-key-field-wrap--with-save)
+  .chat-workspace__masthead-key-input {
+  border-radius: 0;
+}
+
+.chrome-pill-surface.api-key-section__field-wrap .api-key-section__input:focus,
+.chrome-pill-surface.api-key-section__field-wrap .api-key-section__input:focus-visible,
+.chrome-pill-surface.chat-workspace__masthead-key-field-wrap .api-key-section__input:focus,
+.chrome-pill-surface.chat-workspace__masthead-key-field-wrap .api-key-section__input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.chrome-pill-surface.theme-switch.btn.btn--match-action.btn--icon-action {
+  background: var(--input-bg);
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+}
+
+/*
+  API / masthead controls: hover lift (scale + shadow only - no sheen gradient).
+  Idle shell/shadow comes from .chrome-pill-surface when present.
+*/
+.workspace-ui-hover {
+  position: relative;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+}
+
+.workspace-ui-hover:hover {
+  transform: scale(var(--btn-hover-scale));
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--text) 12%, transparent);
+  border-color: color-mix(in srgb, var(--focus) 35%, var(--card-border));
+}
+
+[data-theme='dark'] .workspace-ui-hover:hover {
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--text) 16%, transparent),
+    0 2px 10px color-mix(in srgb, #000 45%, transparent);
+}
+
+.workspace-ui-hover-soft {
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+}
+
+.workspace-ui-hover-soft:not(.chrome-pill-surface) {
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 7%, transparent);
+}
+
+.workspace-ui-hover-soft:hover {
+  transform: scale(var(--btn-hover-scale));
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--text) 12%, transparent);
+}
+
+.workspace-ui-hover-soft:hover .api-key-section__input,
+.workspace-ui-hover-soft:hover .chat-workspace__masthead-key-input {
+  border-color: color-mix(in srgb, var(--focus) 35%, var(--input-frame-inner));
+}
+
+[data-theme='dark'] .workspace-ui-hover-soft:hover {
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--text) 14%, transparent),
+    0 2px 8px color-mix(in srgb, #000 42%, transparent);
+}
+
+.section-header__tools .workspace-ui-hover.theme-switch.btn.btn--match-action.btn--icon-action {
+  border-radius: var(--inner-radius);
+}
+
+.section-header__tools .workspace-ui-hover.theme-switch.theme-switch--diagonal.btn.btn--match-action.btn--icon-action {
+  border-radius: 50%;
+}
+
+.app-mode-segmented--header.workspace-ui-hover.chrome-pill-surface {
+  border-radius: 999px;
+}
+
+.app-mode-segmented--header.workspace-ui-hover:not(.chrome-pill-surface) {
+  border-radius: var(--inner-radius);
+}
+
+.app-mode-segmented--chat-masthead.workspace-ui-hover {
+  border-radius: 999px;
+}
+
+.chat-workspace__key-pill.workspace-ui-hover {
+  border-radius: 999px;
+}
+
+.workspace-ui-hover.theme-switch .theme-switch__thumb {
+  z-index: 2;
+}
+
+.workspace-ui-hover.theme-switch .theme-switch__stack {
+  z-index: 3;
+}
+
+.workspace-ui-hover:disabled,
+.workspace-ui-hover:disabled:hover {
+  transform: none;
+}
+
+.chrome-pill-surface.workspace-ui-hover:disabled,
+.chrome-pill-surface.workspace-ui-hover:disabled:hover {
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 7%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-ui-hover:hover,
+  .workspace-ui-hover-soft:hover {
+    transform: none;
+  }
+
+  .btn:hover:not(:disabled),
+  .btn.workspace-ui-hover:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .copy-icon-btn:hover:not(:disabled),
+  .chat-workspace__composer-icon:hover:not(:disabled),
+  .chat-workspace__composer-send:not(:disabled):hover,
+  .chat-workspace__composer-model-orb:hover,
+  .chat-workspace__history-item-remove:hover:not(:disabled),
+  .chat-workspace__masthead-key-submit:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* Poe-style chat UI teaser - full width; vertical rhythm from .site-inner gap only (same as .landing-preview) */
+.chat-teaser {
+  margin: 0;
+  width: 100%;
+  max-width: var(--content-max);
+  box-sizing: border-box;
+}
+
+.chat-teaser__lead {
+  margin: 0 0 0.65rem;
+}
+
+.chat-teaser__chrome {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  width: 100%;
+  border-radius: var(--card-radius);
+  border: 1px solid var(--card-border);
+  overflow: hidden;
+  box-shadow: var(--card-drop-shadow);
+  background: color-mix(in srgb, var(--card-bg) 70%, transparent);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.chat-teaser__rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  background: color-mix(in srgb, var(--text) 12%, var(--page-bg));
+  border-right: 1px solid var(--card-border);
+}
+
+[data-theme='dark'] .chat-teaser__rail {
+  background: color-mix(in srgb, #000 42%, var(--card-bg));
+}
+
+.chat-teaser__rail-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--header-bg) 50%, var(--text-secondary));
+  opacity: 0.9;
+}
+
+.chat-teaser__rail-fab {
+  margin-top: auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 400;
+  color: var(--header-text);
+  background: var(--badge-circle);
+}
+
+.chat-teaser__stack {
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+  background: var(--card-bg);
+}
+
+.chat-teaser__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--card-border);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.chat-teaser__topbar-chevron {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--text-secondary);
+  opacity: 0.85;
+}
+
+.chat-teaser__thread {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--input-bg);
+}
+
+.chat-teaser__msg {
+  max-width: 92%;
+  padding: 8px 11px;
+  border-radius: 12px;
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.chat-teaser__msg--user {
+  align-self: flex-end;
+  background: color-mix(in srgb, var(--header-bg) 28%, var(--field-bg));
+  border: 1px solid var(--input-frame-inner);
+}
+
+.chat-teaser__msg--assistant {
+  align-self: flex-start;
+  background: var(--field-bg);
+  border: 1px solid color-mix(in srgb, var(--card-border) 90%, transparent);
+}
+
+.chat-teaser__composer {
+  padding: 10px 12px;
+  border-top: 1px solid var(--card-border);
+  background: var(--card-bg);
+}
+
+.chat-teaser__composer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: var(--inner-radius);
+  border: 1px solid var(--input-frame-inner);
+  background: var(--input-bg);
+}
+
+.chat-teaser__composer-placeholder {
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}
+
+.chat-teaser__composer-send {
+  opacity: 0.5;
+  font-size: 14px;
+  transform: rotate(0deg);
+}
+
+.chat-teaser--active .chat-teaser__lead {
+  margin-bottom: 0.75rem;
 }
 
 .api-key-section__form {
@@ -599,6 +1185,169 @@ a:hover {
 
 .api-key-section__input {
   font-family: var(--font-mono);
+}
+
+/* API key column (key, then provider + optional custom when key non-empty) + Save */
+.api-key-section__main-row.input-row {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: var(--input-row-gap);
+  margin-bottom: 0;
+}
+
+.api-key-section__key-column {
+  flex: 1 1 160px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--input-row-gap);
+}
+
+.api-key-section__key-column .api-key-section__field-wrap--key {
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.api-key-section__form .api-key-section__main-row .api-key-section__provider-attached {
+  width: 100%;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.api-key-section__key-column .api-key-section__field-wrap--custom {
+  width: 100%;
+  max-width: none;
+  flex: 0 0 auto;
+}
+
+.api-key-section__main-row .api-key-section__input {
+  flex: 1 1 160px;
+  min-width: 0;
+  /* Same keyline as FilterDropdown on model filters (not global --border) */
+  border-color: var(--input-frame-inner);
+}
+
+.api-key-section__form .api-key-section__main-row .api-key-section__input:focus,
+.api-key-section__form .api-key-section__main-row .api-key-section__input:focus-visible {
+  outline: none;
+  border-color: var(--input-frame-inner);
+  box-shadow: 0 0 0 1px var(--input-frame-inner);
+}
+
+.api-key-section__main-row .api-key-section__input--custom-base {
+  flex: 0 1 200px;
+  min-width: 7rem;
+  max-width: 240px;
+}
+
+/* Align with .btn--match-action (40px): horizontal padding only so height matches FilterDropdown trigger */
+.api-key-section__main-row .btn.btn--match-action {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.api-key-section__field-wrap {
+  display: flex;
+  min-width: 0;
+  border-radius: var(--inner-radius);
+}
+
+.api-key-section__field-wrap--key {
+  flex: 1 1 160px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.api-key-section__eye-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+.api-key-section__eye-btn:hover { opacity: 1; }
+
+.api-key-section__input--key-masked {
+  font-size: 0.6rem !important;
+  letter-spacing: 0.05em;
+}
+
+.api-key-section__field-wrap--key .api-key-section__input {
+  width: 100%;
+  min-width: 0;
+}
+
+.api-key-section__field-wrap--custom {
+  flex: 0 1 200px;
+  min-width: 7rem;
+  max-width: 240px;
+}
+
+.api-key-section__field-wrap--custom .api-key-section__input--custom-base {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Key + provider: single chrome shell (section 1), provider flush under key row */
+.api-key-section__key-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--inner-radius);
+}
+
+.api-key-section__key-shell--with-provider .api-key-section__key-shell-input {
+  border-bottom: 1px solid var(--input-frame-inner);
+}
+
+.api-key-section__key-shell-input {
+  min-width: 0;
+}
+
+.api-key-section__key-shell .api-key-section__field-wrap--key {
+  display: flex;
+  padding: 0 10px 0 12px;
+  align-items: stretch;
+  min-height: 40px;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.api-key-section__key-shell .api-key-section__field-wrap--key .api-key-section__input {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.api-key-section__provider-attached.filter-dropdown {
+  width: 100%;
+  flex: 0 0 auto;
+  position: relative;
+}
+
+.api-key-section__provider-attached .filter-dropdown__trigger {
+  height: 40px;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--input-bg);
+}
+
+.api-key-section__provider-attached.filter-dropdown--open .filter-dropdown__trigger {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .privacy-toggle input[type='checkbox'] {
@@ -681,11 +1430,11 @@ a:hover {
   background: color-mix(in srgb, var(--field-bg) 80%, transparent);
 }
 
-/* ——— Inputs (48px height) ——— */
+/* --- Inputs (48px height) --- */
 .input-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--input-row-gap);
   align-items: stretch;
   margin-bottom: 0;
 }
@@ -749,6 +1498,8 @@ a:hover {
   min-width: 0;
 }
 
+/* Provider under key field: full width of key column (see .api-key-section__provider-attached) */
+
 .filter-dropdown__trigger {
   position: relative;
   width: 100%;
@@ -756,6 +1507,7 @@ a:hover {
   padding: 0 34px 0 12px;
   font-family: var(--font);
   font-size: var(--fs);
+  font-weight: 400;
   color: var(--text);
   background-color: var(--input-bg);
   border: 1px solid var(--input-frame-inner);
@@ -767,6 +1519,16 @@ a:hover {
   justify-content: space-between;
   gap: 0.5rem;
   text-align: left;
+  transition: border-color 0.12s ease, background-color 0.12s ease, color 0.12s ease;
+}
+
+/* Select-like control: subtle hover only (no lift / sheen — same family as text fields). */
+.filter-dropdown__trigger:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--focus) 30%, var(--input-frame-inner));
+}
+
+[data-theme='dark'] .filter-dropdown__trigger:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--focus) 38%, var(--card-border));
 }
 
 .filter-dropdown__trigger:focus-visible {
@@ -834,6 +1596,7 @@ a:hover {
   padding: 8px 12px;
   font-family: var(--font);
   font-size: var(--fs-sm);
+  font-weight: 400;
   line-height: 1.35;
   color: var(--text);
   border: none;
@@ -848,7 +1611,7 @@ a:hover {
 }
 
 .filter-dropdown__option.is-selected {
-  font-weight: 700;
+  font-weight: 400;
 }
 
 input[type='text'],
@@ -913,7 +1676,42 @@ textarea {
     0 0 0 1px var(--input-frame-inner);
 }
 
-/* ——— Run button + temperature (site palette, oval range thumb) ——— */
+/*
+  API key row: one outer chrome (.chrome-pill-surface on shell / masthead composite).
+  Strip global input border + .section inset ring so we don’t get a double keyline.
+*/
+.section .api-key-section__key-shell .api-key-section__input,
+.section .api-key-section__key-shell input[type='password'],
+.section .api-key-section__key-shell input[type='text'] {
+  border: none;
+  box-shadow: none;
+}
+
+.section .api-key-section__key-shell .api-key-section__input:focus,
+.section .api-key-section__key-shell .api-key-section__input:focus-visible,
+.section .api-key-section__key-shell input[type='password']:focus,
+.section .api-key-section__key-shell input[type='password']:focus-visible {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.chat-workspace__masthead-key-composite .chat-workspace__masthead-key-input,
+.chat-workspace__masthead-key-composite .api-key-section__input {
+  border: none;
+  box-shadow: none;
+}
+
+.chat-workspace__masthead-key-composite .chat-workspace__masthead-key-input:focus,
+.chat-workspace__masthead-key-composite .chat-workspace__masthead-key-input:focus-visible,
+.chat-workspace__masthead-key-composite .api-key-section__input:focus,
+.chat-workspace__masthead-key-composite .api-key-section__input:focus-visible {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+/* --- Run button + temperature (site palette, oval range thumb) --- */
 .run-temperature-wrap {
   display: flex;
   flex-direction: column;
@@ -995,6 +1793,44 @@ textarea {
   margin-top: 0.5rem;
 }
 
+.prompt-mutation-wrap {
+  margin-top: 8px;
+}
+
+.prompt-mutation-wrap__wip-note {
+  margin: 0 0 0.55rem;
+}
+
+.prompt-mutation-wrap__model-row {
+  margin-top: 0.5rem;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+}
+
+.prompt-mutation-wrap__half {
+  flex: 1 1 50%;
+  min-width: 0;
+}
+
+.prompt-mutation-wrap__half .filter-dropdown {
+  width: 100%;
+}
+
+.prompt-mutation-class-detail {
+  margin-top: 0.45rem;
+  margin-bottom: 0;
+}
+
+@media (max-width: 980px) {
+  .prompt-mutation-wrap__model-row {
+    flex-wrap: wrap;
+  }
+
+  .prompt-mutation-wrap__half {
+    flex-basis: 100%;
+  }
+}
+
 .prompt-library__field {
   position: relative;
   flex: 1 1 240px;
@@ -1053,7 +1889,7 @@ textarea {
   min-width: 0;
   /* No horizontal inset so the value lines up with fixed-width row buttons (Save / Run selected). */
   padding: 8px 0;
-  /* Same plane as parent .section card — no nested panel */
+  /* Same plane as parent .section card - no nested panel */
   background: transparent;
   border: none;
   border-radius: 0;
@@ -1207,8 +2043,9 @@ textarea {
   border-color: color-mix(in srgb, var(--text) 38%, var(--btn-bg));
 }
 
-/* ——— Buttons (all variants share base + hover) ——— */
+/* --- Buttons (all variants share base + hover) --- */
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1218,27 +2055,95 @@ textarea {
   font-size: var(--fs);
   font-weight: 600;
   line-height: 1.2;
-  color: var(--btn-text);
-  background: var(--btn-bg);
-  border: 1px solid color-mix(in srgb, var(--text) 18%, var(--btn-bg));
   border-radius: var(--inner-radius);
   cursor: pointer;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    color 0.12s ease;
 }
 
-.btn:hover:not(:disabled) {
+/* Idle fill matches Save & Verify (green wash). Theme switch keeps tan track. */
+.btn:not(.theme-switch) {
+  color: var(--text);
   background:
     linear-gradient(
       to top,
-      color-mix(in srgb, var(--header-bg) 70%, transparent) 0%,
-      color-mix(in srgb, var(--header-bg) 40%, transparent) 24%,
+      color-mix(in srgb, var(--save-verify-wash) 20%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash) 7%, transparent) 46%,
       transparent 100%
     ),
-    var(--btn-bg);
-  border-color: color-mix(in srgb, var(--header-bg) 34%, var(--btn-bg));
+    color-mix(in srgb, var(--text) 7%, var(--field-bg));
+  border: 1px solid color-mix(in srgb, var(--save-verify-wash) 18%, var(--card-border));
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 7%, transparent);
 }
 
-.btn:active:not(:disabled) {
+[data-theme='dark'] .btn:not(.theme-switch) {
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--save-verify-wash-dark) 20%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash-dark) 7%, transparent) 46%,
+      transparent 100%
+    ),
+    color-mix(in srgb, var(--text) 20%, var(--input-bg));
+  border: 1px solid color-mix(in srgb, var(--save-verify-wash-dark) 18%, var(--card-border));
+}
+
+.btn.theme-switch {
+  color: var(--btn-text);
+  background: var(--btn-bg);
+  border: 1px solid color-mix(in srgb, var(--text) 18%, var(--btn-bg));
+  box-shadow: none;
+}
+
+.btn:not(.theme-switch):hover:not(:disabled) {
+  transform: scale(var(--btn-hover-scale));
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--text) 12%, transparent);
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--save-verify-wash) 27%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash) 10%, transparent) 44%,
+      transparent 100%
+    ),
+    color-mix(in srgb, var(--btn-bg) 34%, var(--input-bg));
+  border-color: color-mix(in srgb, var(--save-verify-wash) 32%, var(--card-border));
+  color: var(--text);
+}
+
+[data-theme='dark'] .btn:not(.theme-switch):hover:not(:disabled) {
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--save-verify-wash-dark) 27%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash-dark) 10%, transparent) 44%,
+      transparent 100%
+    ),
+    color-mix(in srgb, var(--text) 26%, var(--input-bg));
+  color: var(--text);
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--text) 16%, transparent),
+    0 2px 10px color-mix(in srgb, #000 45%, transparent);
+}
+
+.btn.theme-switch:hover:not(:disabled) {
+  transform: scale(var(--btn-hover-scale));
+}
+
+.btn:not(.theme-switch):active:not(:disabled) {
+  background: color-mix(in srgb, var(--btn-bg-active) 24%, color-mix(in srgb, var(--text) 7%, var(--field-bg)));
+  border-color: color-mix(in srgb, var(--text) 22%, var(--btn-bg-active));
+}
+
+[data-theme='dark'] .btn:not(.theme-switch):active:not(:disabled) {
+  background: color-mix(in srgb, var(--btn-bg-active) 28%, color-mix(in srgb, var(--text) 20%, var(--input-bg)));
+  border-color: color-mix(in srgb, var(--text) 22%, var(--btn-bg-active));
+}
+
+.btn.theme-switch:active:not(:disabled) {
   background: var(--btn-bg-active);
   border-color: color-mix(in srgb, var(--text) 22%, var(--btn-bg-active));
 }
@@ -1246,6 +2151,17 @@ textarea {
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn.workspace-ui-hover:hover:not(:disabled) {
+  transform: scale(var(--btn-hover-scale));
+  border-color: color-mix(in srgb, var(--focus) 35%, var(--card-border));
+}
+
+[data-theme='dark'] .btn.workspace-ui-hover:hover:not(:disabled) {
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--text) 16%, transparent),
+    0 2px 10px color-mix(in srgb, #000 45%, transparent);
 }
 
 /* .btn--primary: same as .btn; class used in markup for primary actions */
@@ -1281,7 +2197,7 @@ textarea {
   font-weight: 700;
 }
 
-/* ——— API key status ——— */
+/* --- API key status --- */
 .key-status {
   display: flex;
   flex-wrap: wrap;
@@ -1301,7 +2217,7 @@ textarea {
   border-radius: var(--inner-radius);
 }
 
-/* ——— Model list: keyline = Test prompt (same color). Inset shadow does not
+/* --- Model list: keyline = Test prompt (same color). Inset shadow does not
    work here: row backgrounds paint on top and hide a parent inset. Use border. */
 .model-grid {
   display: flex;
@@ -1385,11 +2301,24 @@ textarea {
   box-shadow: none;
 }
 
+.model-name-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.model-name-row__icon {
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
 .model-name {
   font-size: var(--fs);
   font-weight: 700;
   color: var(--text);
   line-height: 1.3;
+  min-width: 0;
+  flex: 1;
 }
 
 .model-meta {
@@ -1405,7 +2334,7 @@ textarea {
   min-width: 0;
 }
 
-/* ——— Results ——— */
+/* --- Results --- */
 .results-placeholder {
   margin: 0;
   padding: 1.5rem 1rem;
@@ -1690,7 +2619,7 @@ textarea {
 .export-menu__panel .filter-dropdown__option.export-menu__item {
   padding: 8px 0;
   white-space: nowrap;
-  /* Override global .filter-dropdown__option.is-selected — bold only the label */
+  /* Override global .filter-dropdown__option.is-selected - bold only the label */
   font-weight: 400;
 }
 
@@ -1768,11 +2697,21 @@ textarea {
 }
 
 .chat-panel__meta {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
   margin-top: 0.15rem;
   font-size: var(--fs-sm);
   color: var(--text-secondary);
   word-break: break-word;
+}
+
+.chat-panel__meta-icon {
+  flex-shrink: 0;
+}
+
+.chat-panel__meta-text {
+  min-width: 0;
 }
 
 .chat-panel__messages {
@@ -1926,7 +2865,7 @@ textarea {
   height: 17px;
   aspect-ratio: 1 / 1;
   display: block;
-  background-color: var(--badge-circle);
+  background-color: var(--text);
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
@@ -1936,8 +2875,8 @@ textarea {
 }
 
 .response-action-icon--retry {
-  mask-image: url('../assets/icons/actions/retry.png');
-  -webkit-mask-image: url('../assets/icons/actions/retry.png');
+  mask-image: url('../assets/icons/actions/reload.png');
+  -webkit-mask-image: url('../assets/icons/actions/reload.png');
 }
 .response-action-icon--reload {
   mask-image: url('../assets/icons/actions/reload.png');
@@ -1983,10 +2922,20 @@ textarea {
   height: 23px;
 }
 
+.response-action-icon--mutation.response-action-icon--btn-tone {
+  width: 23px;
+  height: 23px;
+}
+
+.response-action-icon--mutation {
+  mask-image: url('../assets/icons/actions/mutation.png');
+  -webkit-mask-image: url('../assets/icons/actions/mutation.png');
+}
+
 .response-action-icon--btn-tone {
   width: 19px;
   height: 19px;
-  background-color: var(--btn-text);
+  background-color: var(--text);
 }
 
 .response-action-icon--select-all.response-action-icon--btn-tone {
@@ -2011,12 +2960,26 @@ textarea {
   background: var(--page-bg);
 }
 
-.response-title h3 {
-  margin: 0 0 0.2rem;
+.response-title__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin-bottom: 0.2rem;
+}
+
+.response-title__icon {
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.response-title__head h3 {
+  margin: 0;
   font-size: var(--fs);
   font-weight: 700;
   color: var(--text);
   line-height: 1.25;
+  min-width: 0;
+  flex: 1;
 }
 
 .response-meta {
@@ -2048,6 +3011,168 @@ textarea {
   background: var(--input-bg);
   border: none;
   border-top: 1px solid var(--input-frame-inner);
+}
+
+/* Model reply: Markdown + GFM (tables, fences), optional bare JSON */
+.reply-window.reply-window--md {
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  white-space: normal;
+  line-height: 1.55;
+}
+
+.reply-window--md :first-child {
+  margin-top: 0;
+}
+
+.reply-window--md :last-child {
+  margin-bottom: 0;
+}
+
+.reply-window--md p {
+  margin: 0.5rem 0;
+}
+
+.reply-window--md h1,
+.reply-window--md h2,
+.reply-window--md h3,
+.reply-window--md h4 {
+  margin: 0.85rem 0 0.4rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.reply-window--md h1 {
+  font-size: 1.25rem;
+}
+
+.reply-window--md h2 {
+  font-size: 1.1rem;
+}
+
+.reply-window--md h3,
+.reply-window--md h4 {
+  font-size: 1rem;
+}
+
+.reply-window--md ul,
+.reply-window--md ol {
+  margin: 0.5rem 0;
+  padding-left: 1.35rem;
+}
+
+.reply-window--md li {
+  margin: 0.2rem 0;
+}
+
+.reply-window--md blockquote {
+  margin: 0.5rem 0;
+  padding: 0.35rem 0 0.35rem 0.85rem;
+  border-left: 3px solid color-mix(in srgb, var(--focus) 45%, var(--card-border));
+  color: var(--text-secondary);
+}
+
+.reply-window--md hr {
+  border: none;
+  border-top: 1px solid var(--input-frame-inner);
+  margin: 0.75rem 0;
+}
+
+.reply-window--md table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.5rem 0;
+  font-size: calc(var(--fs-sm) * 0.95);
+}
+
+.reply-window--md th,
+.reply-window--md td {
+  border: 1px solid var(--input-frame-inner);
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.reply-window--md th {
+  background: color-mix(in srgb, var(--field-bg) 70%, var(--input-bg));
+}
+
+.reply-md-pre {
+  margin: 0.5rem 0;
+  padding: 12px 14px;
+  overflow: auto;
+  max-width: 100%;
+  font-family: var(--font-mono);
+  font-size: calc(var(--fs-sm) * 0.95);
+  line-height: 1.45;
+  background: color-mix(in srgb, var(--text) 4%, var(--input-bg));
+  border: 1px solid var(--input-frame-inner);
+  border-radius: var(--inner-radius);
+}
+
+.reply-md-pre--json {
+  margin: 0;
+}
+
+.reply-md-pre code,
+.reply-md-code-block {
+  font-family: inherit;
+  font-size: inherit;
+  display: block;
+  white-space: pre;
+  word-break: normal;
+  overflow-wrap: normal;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.reply-md-code-inline {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: 0.12em 0.35em;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--text) 6%, var(--input-bg));
+  border: 1px solid color-mix(in srgb, var(--input-frame-inner) 80%, transparent);
+}
+
+.reply-md-a {
+  color: var(--focus);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.reply-md-link-fallback {
+  color: var(--text-secondary);
+}
+
+.reply-window__inline-img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0.5rem 0;
+  border-radius: var(--inner-radius);
+  border: 1px solid var(--input-frame-inner);
+}
+
+.reply-window__inline-video {
+  max-width: 100%;
+  width: 100%;
+  max-height: min(360px, 50vh);
+  height: auto;
+  display: block;
+  margin: 0.5rem 0;
+  border-radius: var(--inner-radius);
+  border: 1px solid var(--input-frame-inner);
+  background: color-mix(in srgb, var(--text) 6%, var(--input-bg));
+}
+
+.reply-window__inline-audio {
+  width: 100%;
+  display: block;
+  margin: 0.5rem 0;
+  border-radius: var(--inner-radius);
 }
 
 .scroll-fade-shell {
@@ -2137,7 +3262,7 @@ textarea {
   border: 1px solid var(--input-frame-inner);
   border-radius: var(--inner-radius);
   overflow: hidden;
-  background: var(--input-bg);
+  background: color-mix(in srgb, var(--input-bg) 30%, var(--page-bg));
 }
 
 .model-grid-shell::before,
@@ -2177,7 +3302,7 @@ textarea {
   content: none;
 }
 
-/* ——— Responsive ——— */
+/* --- Responsive --- */
 @media (max-width: 720px) {
   :root {
     --pad-x: var(--pad-x-mobile);
@@ -2185,6 +3310,12 @@ textarea {
 
   .input-row {
     flex-direction: column;
+  }
+
+  .api-key-section__form .api-key-section__main-row.input-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
   }
 
   .run-temperature-bar {
@@ -2328,14 +3459,31 @@ textarea {
     line-height: 1.2;
   }
 
+  .chat-workspace__masthead .api-key-section__input.chat-workspace__masthead-key-input {
+    height: var(--masthead-toolbar-h);
+    min-height: var(--masthead-toolbar-h);
+    max-height: var(--masthead-toolbar-h);
+    line-height: calc(var(--masthead-toolbar-h) - 2px);
+  }
+
   .api-key-section__form .input-row {
     align-items: center;
   }
 
   /* In column flex on mobile, inputs inherit `flex: 1 1 200px` which becomes HEIGHT.
-     Override for the API key field so it stays a single-line input, not a big box. */
-  .api-key-section__form .input-row .api-key-section__input {
+     Main API row stays row; inputs inside must not forced to width 100%. */
+  .api-key-section__form .input-row:not(.api-key-section__main-row) .api-key-section__input {
     flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .api-key-section__form .api-key-section__main-row .api-key-section__input {
+    flex: 1 1 120px;
+    min-width: 0;
+    width: auto;
+  }
+
+  .api-key-section__form .api-key-section__main-row .api-key-section__provider-attached {
     width: 100%;
   }
 
@@ -2402,6 +3550,3683 @@ textarea {
     flex-direction: column;
     flex-wrap: nowrap;
     align-self: start;
+  }
+}
+
+/* --- Poe-style chat workspace (verified key + Chat mode) --- */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.site-main.site-main--chat-workspace {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  /* Let .app-comet-backdrop (z-index 0) show through; default .site-main background would hide comets */
+  background: transparent;
+}
+
+.chat-workspace {
+  --masthead-toolbar-h: 34px;
+  /** Sidebar nav + billing orbs; matches header “add model” orb. */
+  --chat-sidebar-orb-size: 38px;
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  min-height: calc(100vh - 0px);
+  width: 100%;
+  background: transparent;
+}
+
+.chat-workspace__sidebar {
+  --chat-sidebar-stack-gap: 8px;
+  /* One type ramp for RT / $ / nav: Inter --fs-sm, bold; same ink as mask icons at rest. */
+  --chat-sidebar-label-fs: var(--fs-sm);
+  --chat-sidebar-label-weight: 700;
+  /*
+    Orb fills (dark theme; light theme overrides to 70% --page-bg below): blend toward `--page-bg`
+    vs `--input-bg` so glyphs stay readable on the rail.
+  */
+  --chat-sidebar-orb-surface: color-mix(in srgb, var(--page-bg) 30%, var(--input-bg));
+  font-family: var(--font);
+  flex: 0 0 var(--chat-sidebar-w, 56px);
+  width: var(--chat-sidebar-w, 56px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--chat-sidebar-stack-gap);
+  min-height: 0;
+  position: relative;
+  border-right: none;
+  /*
+    Top: same tone as the message composer field (`--input-bg`).
+    Bottom: ~20% opacity of that color (fade toward transparent) — no horizontal rules inside the rail.
+  */
+  background: linear-gradient(
+    180deg,
+    var(--input-bg) 0%,
+    color-mix(in srgb, var(--input-bg) 20%, transparent) 100%
+  );
+}
+
+/* 1px right edge: full --card-border at top → 20% border / 80% page bg at bottom (dissolve into canvas) */
+.chat-workspace__sidebar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    var(--card-border) 0%,
+    color-mix(in srgb, var(--card-border) 20%, var(--page-bg) 80%) 100%
+  );
+}
+
+/* Light theme: orbit fills lean toward --page-bg (70%) vs composer white — matches main canvas tone */
+html:not([data-theme='dark']) .chat-workspace__sidebar {
+  --chat-sidebar-orb-surface: color-mix(in srgb, var(--page-bg) 70%, var(--input-bg) 30%);
+}
+
+.chat-workspace__nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--chat-sidebar-stack-gap, 8px);
+  /* No top padding: keeps Chat History… aligned with the same 8px stack gap as above; sides/bottom only */
+  padding: 0 10px 8px;
+  overflow-y: visible;
+  overflow-x: visible;
+  min-height: 0;
+}
+
+.chat-workspace__nav-btn {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--chat-sidebar-orb-size);
+  height: var(--chat-sidebar-orb-size);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  border-radius: 50%;
+  background: var(--chat-sidebar-orb-surface, var(--input-bg));
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    color 0.12s ease,
+    transform 0.12s ease;
+}
+
+.chat-workspace__nav-btn:hover {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--focus) 40%, var(--card-border));
+  background: color-mix(in srgb, var(--text) 5%, var(--chat-sidebar-orb-surface, var(--input-bg)));
+  transform: scale(var(--btn-hover-scale));
+}
+
+.chat-workspace__nav-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 45%, transparent);
+}
+
+/* Mode switch: same idle as sibling orbs; shimmer icon + border to red / yellow. Orb bg untouched. */
+@keyframes chat-mode-toggle-swords {
+  0%,
+  100% {
+    color: var(--text-secondary);
+    border-color: color-mix(in srgb, var(--card-border) 85%, transparent);
+  }
+  50% {
+    color: #b91c1c;
+    border-color: color-mix(
+      in srgb,
+      #dc2626 38%,
+      color-mix(in srgb, var(--card-border) 85%, transparent)
+    );
+  }
+}
+
+@keyframes chat-mode-toggle-chat {
+  0%,
+  100% {
+    color: var(--text-secondary);
+    border-color: color-mix(in srgb, var(--card-border) 85%, transparent);
+  }
+  50% {
+    color: #92400e;
+    border-color: color-mix(
+      in srgb,
+      #b45309 30%,
+      color-mix(in srgb, var(--card-border) 85%, transparent)
+    );
+  }
+}
+
+@keyframes chat-mode-toggle-swords-dark {
+  0%,
+  100% {
+    color: var(--text-secondary);
+    border-color: color-mix(in srgb, var(--card-border) 85%, transparent);
+  }
+  50% {
+    color: #f87171;
+    border-color: color-mix(
+      in srgb,
+      #f87171 40%,
+      color-mix(in srgb, var(--card-border) 85%, transparent)
+    );
+  }
+}
+
+@keyframes chat-mode-toggle-chat-dark {
+  0%,
+  100% {
+    color: var(--text-secondary);
+    border-color: color-mix(in srgb, var(--card-border) 85%, transparent);
+  }
+  50% {
+    color: #ca8a04;
+    border-color: color-mix(
+      in srgb,
+      #ca8a04 32%,
+      color-mix(in srgb, var(--card-border) 85%, transparent)
+    );
+  }
+}
+
+.chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-swords,
+.chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-chat {
+  transition:
+    transform 0.12s ease,
+    background 0.12s ease;
+  animation-duration: 3.4s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-swords {
+  animation-name: chat-mode-toggle-swords;
+}
+
+.chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-chat {
+  animation-name: chat-mode-toggle-chat;
+}
+
+.chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-swords:hover {
+  animation-play-state: paused;
+  border-color: color-mix(in srgb, #ef4444 44%, color-mix(in srgb, var(--card-border) 85%, transparent));
+  background: var(--chat-sidebar-orb-surface, var(--input-bg));
+  color: #991b1b;
+}
+
+.chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-chat:hover {
+  animation-play-state: paused;
+  border-color: color-mix(in srgb, #b45309 36%, color-mix(in srgb, var(--card-border) 85%, transparent));
+  background: var(--chat-sidebar-orb-surface, var(--input-bg));
+  color: #78350f;
+}
+
+[data-theme='dark'] .chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-swords {
+  animation-name: chat-mode-toggle-swords-dark;
+}
+
+[data-theme='dark'] .chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-chat {
+  animation-name: chat-mode-toggle-chat-dark;
+}
+
+[data-theme='dark'] .chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-swords:hover {
+  border-color: color-mix(in srgb, #fca5a5 46%, color-mix(in srgb, var(--card-border) 85%, transparent));
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-chat:hover {
+  border-color: color-mix(in srgb, #ca8a04 40%, color-mix(in srgb, var(--card-border) 85%, transparent));
+  color: #eab308;
+}
+
+.chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-swords:focus-visible {
+  animation-play-state: paused;
+  border-color: color-mix(in srgb, #ef4444 44%, color-mix(in srgb, var(--card-border) 85%, transparent));
+  color: #991b1b;
+}
+
+.chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-chat:focus-visible {
+  animation-play-state: paused;
+  border-color: color-mix(in srgb, #b45309 36%, color-mix(in srgb, var(--card-border) 85%, transparent));
+  color: #78350f;
+}
+
+[data-theme='dark'] .chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-swords:focus-visible {
+  border-color: color-mix(in srgb, #fca5a5 46%, color-mix(in srgb, var(--card-border) 85%, transparent));
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-chat:focus-visible {
+  border-color: color-mix(in srgb, #ca8a04 40%, color-mix(in srgb, var(--card-border) 85%, transparent));
+  color: #eab308;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-swords,
+  .chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-chat {
+    animation: none;
+  }
+
+  .chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-swords {
+    color: #b91c1c;
+    border-color: color-mix(
+      in srgb,
+      #dc2626 38%,
+      color-mix(in srgb, var(--card-border) 85%, transparent)
+    );
+  }
+
+  .chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-chat {
+    color: #92400e;
+    border-color: color-mix(
+      in srgb,
+      #b45309 30%,
+      color-mix(in srgb, var(--card-border) 85%, transparent)
+    );
+  }
+
+  [data-theme='dark'] .chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-swords {
+    color: #f87171;
+    border-color: color-mix(
+      in srgb,
+      #f87171 40%,
+      color-mix(in srgb, var(--card-border) 85%, transparent)
+    );
+  }
+
+  [data-theme='dark'] .chat-workspace__nav-btn.chat-workspace__nav-btn--mode-toggle-chat {
+    color: #ca8a04;
+    border-color: color-mix(
+      in srgb,
+      #ca8a04 32%,
+      color-mix(in srgb, var(--card-border) 85%, transparent)
+    );
+  }
+}
+
+/* Both mode glyphs stay mounted; only opacity toggles — avoids mask URL cold-start on switch. */
+.chat-workspace__mode-toggle-icon-stack {
+  position: relative;
+  z-index: 1;
+  width: 23px;
+  height: 23px;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.chat-workspace__mode-toggle-icon-stack > .chat-workspace__nav-icon {
+  grid-area: 1 / 1;
+  transition: opacity 0.07s ease;
+}
+
+.chat-workspace__nav-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-workspace__svg {
+  width: 22px;
+  height: 22px;
+}
+
+.chat-workspace__nav-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  background-color: currentColor;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+/* Sidebar PNG masks only: shrink glyph inside the orb, not the 38px circle */
+.chat-workspace__nav-icon.chat-workspace__nav-icon--glyph-90 {
+  transform: scale(0.9);
+  transform-origin: center;
+}
+
+/* clear5.png: key is drawn to the image edge — smaller mask area so it doesn’t look cropped in the circle */
+.chat-workspace__nav-icon.chat-workspace__nav-icon--clear-key {
+  -webkit-mask-size: 86% 86%;
+  mask-size: 86% 86%;
+}
+
+.chat-workspace__nav-theme-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* +4px vs prior 22px so sun / moon read clearly in the orb */
+  width: 26px;
+  height: 26px;
+  font-size: 14px;
+  font-weight: var(--chat-sidebar-label-weight);
+  line-height: 1;
+  color: inherit;
+}
+
+.chat-workspace__nav-badge {
+  position: absolute;
+  top: -10px;
+  right: -5px;
+  z-index: 3;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  color: var(--header-text);
+  background: var(--badge-circle);
+}
+
+.chat-workspace__nav-btn--active {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--focus) 45%, var(--card-border));
+  background: color-mix(in srgb, var(--focus) 12%, var(--chat-sidebar-orb-surface, var(--input-bg)));
+}
+
+.chat-workspace__history-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: color-mix(in srgb, #000 42%, transparent);
+  cursor: pointer;
+}
+
+.chat-workspace__history-drawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: var(--chat-sidebar-w, 56px);
+  z-index: 90;
+  width: min(320px, calc(100vw - var(--chat-sidebar-w, 56px)));
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 12px 12px 16px;
+  border-right: 1px solid color-mix(in srgb, var(--card-border) 88%, transparent);
+  /* Top: opaque; bottom: ~60% transparency (40% card-bg) so workspace shows through */
+  background: linear-gradient(
+    to bottom,
+    var(--card-bg) 0%,
+    var(--card-bg) 28%,
+    color-mix(in srgb, var(--card-bg) 40%, transparent) 100%
+  );
+  color: var(--text);
+  box-shadow: 4px 0 24px color-mix(in srgb, #000 25%, transparent);
+  overflow-y: auto;
+}
+
+.chat-workspace__history-drawer-head {
+  display: block;
+}
+
+.chat-workspace__history-drawer-title {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.chat-workspace__history-drawer-hint {
+  margin: -8px 0 4px;
+}
+
+.chat-workspace__history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-workspace__history-item {
+  position: relative;
+  padding: 10px 34px 12px 10px;
+  /* Mostly matches chat capsule radius; top-right square so delete slot reads “tab” / folder corner. */
+  border-radius: 26px 0 26px 26px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  background: var(--input-bg);
+}
+
+.chat-workspace__history-item-open {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 24px 0 24px 24px;
+}
+
+.chat-workspace__history-item-open:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.chat-workspace__history-item-open:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.chat-workspace__history-item-open:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 45%, transparent);
+}
+
+.chat-workspace__history-item-title {
+  font-size: var(--fs-sm);
+  font-weight: 650;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.chat-workspace__history-item-meta {
+  font-size: calc(var(--fs-sm) * 0.88);
+  color: var(--text-secondary);
+}
+
+/*
+  ~30% smaller than 32px persona orb; anchored top-right so hover scale() doesn’t drift.
+  Hue sheen: .sheen-orb + chatOrbSheenStyle (same as model chips).
+*/
+.chat-workspace__history-item-remove {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  z-index: 2;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  transform-origin: top right;
+  border: 1px solid
+    color-mix(
+      in srgb,
+      color-mix(in srgb, var(--card-border) 85%, transparent) 70%,
+      transparent
+    );
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 7%, transparent);
+  transition:
+    border-color 0.12s ease,
+    color 0.12s ease,
+    transform 0.14s ease,
+    box-shadow 0.14s ease;
+}
+
+[data-theme='dark'] .chat-workspace__history-item-remove {
+  border: 1px solid
+    color-mix(
+      in srgb,
+      color-mix(in srgb, var(--text-secondary) 42%, var(--card-border)) 70%,
+      transparent
+    );
+}
+
+.chat-workspace__history-item-remove-icon.chat-workspace__svg {
+  display: block;
+  width: 13px;
+  height: 13px;
+}
+
+.chat-workspace__history-item-remove:hover:not(:disabled) {
+  color: var(--danger, #e85d5d);
+  border-color: color-mix(in srgb, var(--focus) 40%, var(--card-border));
+  transform: scale(var(--btn-hover-scale));
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--text) 12%, transparent);
+}
+
+[data-theme='dark'] .chat-workspace__history-item-remove:hover:not(:disabled) {
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--text) 16%, transparent),
+    0 2px 10px color-mix(in srgb, #000 45%, transparent);
+}
+
+.chat-workspace__dev-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 82;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: color-mix(in srgb, #000 38%, transparent);
+  cursor: pointer;
+}
+
+.chat-workspace__dev-drawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: var(--chat-sidebar-w, 56px);
+  z-index: 92;
+  width: min(300px, calc(100vw - var(--chat-sidebar-w, 56px)));
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 12px 12px 16px;
+  border-right: 1px solid color-mix(in srgb, var(--card-border) 88%, transparent);
+  background: var(--card-bg);
+  color: var(--text);
+  box-shadow: 4px 0 20px color-mix(in srgb, #000 22%, transparent);
+  overflow-y: auto;
+}
+
+.chat-workspace__dev-drawer-head {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chat-workspace__dev-drawer-title {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.chat-workspace__dev-drawer-close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.chat-workspace__dev-drawer-close:hover {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--focus) 40%, var(--card-border));
+}
+
+.chat-workspace__dev-roadmap {
+  margin: 0 0 12px;
+  padding: 10px 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  background: var(--input-bg);
+}
+
+.chat-workspace__dev-roadmap-title {
+  margin: 0 0 6px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.chat-workspace__dev-roadmap-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: calc(var(--fs-sm) * 0.95);
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.chat-workspace__dev-roadmap-list li {
+  margin-bottom: 4px;
+}
+
+.chat-workspace__dev-drawer-lead {
+  margin: 0 0 6px;
+}
+
+.chat-workspace__dev-stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-workspace__dev-stats li {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: calc(var(--fs-sm) * 0.95);
+}
+
+.chat-workspace__dev-stat-label {
+  color: var(--text-secondary);
+}
+
+.chat-workspace__dev-stat-value {
+  font-weight: 650;
+  word-break: break-all;
+  text-align: right;
+}
+
+.chat-workspace__dev-actions {
+  margin-top: 4px;
+}
+
+.chat-workspace__dev-reload-models {
+  width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  background: color-mix(in srgb, var(--text) 5%, var(--input-bg));
+  color: var(--text);
+  font-size: calc(var(--fs-sm) * 0.95);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chat-workspace__dev-reload-models:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--focus) 40%, var(--card-border));
+}
+
+.chat-workspace__dev-reload-models:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.chat-workspace__dev-links-label {
+  margin: 10px 0 4px;
+}
+
+.chat-workspace__dev-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: calc(var(--fs-sm) * 0.92);
+}
+
+.chat-workspace__dev-links a {
+  color: var(--focus);
+  text-decoration: none;
+}
+
+.chat-workspace__dev-links a:hover {
+  text-decoration: underline;
+}
+
+.chat-workspace__sidebar-top-slot {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--chat-sidebar-stack-gap, 8px);
+  padding: max(10px, env(safe-area-inset-top, 0px)) 6px 0;
+}
+
+.chat-workspace__sidebar-mode-label {
+  font-family: var(--font);
+  font-size: var(--chat-sidebar-label-fs);
+  font-weight: var(--chat-sidebar-label-weight);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-align: center;
+  color: inherit;
+}
+
+/* Mode toggle: PNG masks (user assets); whole px. */
+.chat-workspace__nav-icon.chat-workspace__nav-icon--redteam-swords {
+  width: 19px;
+  height: 19px;
+}
+
+/* Mode toggle: PNG robot mask (Red Team → chat); whole px. */
+.chat-workspace__nav-icon.chat-workspace__nav-icon--mode-chat-robot {
+  width: 23px;
+  height: 23px;
+  position: relative;
+  top: -1px;
+}
+
+.chat-workspace__sidebar-billing {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--chat-sidebar-stack-gap, 8px);
+  padding: 0 6px 0;
+}
+
+.chat-workspace__sidebar-balance {
+  box-sizing: border-box;
+  width: var(--chat-sidebar-orb-size);
+  height: var(--chat-sidebar-orb-size);
+  min-width: var(--chat-sidebar-orb-size);
+  min-height: var(--chat-sidebar-orb-size);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  background: var(--chat-sidebar-orb-surface, var(--input-bg));
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  font-family: var(--font);
+  flex-shrink: 0;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    color 0.12s ease,
+    transform 0.12s ease;
+}
+
+.chat-workspace__sidebar-balance:hover {
+  border-color: color-mix(in srgb, var(--focus) 40%, var(--card-border));
+  background: color-mix(in srgb, var(--text) 5%, var(--chat-sidebar-orb-surface, var(--input-bg)));
+  color: var(--text);
+  transform: scale(var(--btn-hover-scale));
+}
+
+.chat-workspace__sidebar-balance:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 45%, transparent);
+}
+
+.chat-workspace__sidebar-balance-amount {
+  max-width: calc(var(--chat-sidebar-orb-size) - 6px);
+  line-height: 1;
+  font-family: var(--font);
+  font-size: var(--chat-sidebar-label-fs);
+  font-weight: var(--chat-sidebar-label-weight);
+  letter-spacing: 0.02em;
+  color: inherit;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-workspace__nav-icon-feedback-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+}
+
+.chat-workspace__nav-icon-feedback-wrap .chat-workspace__svg {
+  width: calc(22px * 0.85 * 0.9);
+  height: calc(22px * 0.85 * 0.9);
+  transform: translate(-2px, 1px);
+}
+
+.app-redteam-workspace {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.app-redteam-workspace__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-redteam-workspace__rail.chat-workspace__sidebar {
+  align-self: stretch;
+}
+
+.chat-workspace--theater .chat-workspace__main {
+  min-height: min(100vh, 100dvh);
+}
+
+.chat-workspace__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+}
+
+.chat-workspace__privacy-footer {
+  width: 100%;
+  max-width: min(1040px, calc(100% - 2 * var(--pad-x)));
+  margin: 0.5rem auto calc(8px + env(safe-area-inset-bottom, 0px));
+  padding: 0 var(--pad-x);
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  /* ~50% softer than secondary text: blend toward page bg (works light + dark) */
+  color: color-mix(in srgb, var(--text-secondary) 50%, var(--page-bg));
+  opacity: 1;
+}
+
+/*
+  Masthead API row width is set from JS to match the measured logo + TeamTestHub row (ResizeObserver).
+  Wrapper has no horizontal padding so edges align with the brand glyph and the last letter of the title.
+*/
+.chat-workspace__masthead-brand-align {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: min(1040px, calc(100% - 2 * var(--pad-x)));
+  margin-inline: auto;
+  padding-inline: 0;
+}
+
+/*
+  Before the API key is saved, stretch the key row vs the measured logo+title width (capped by max-width).
+  Currently 2.25× brand row (= 3× with a 25% width reduction) — see --chat-brand-row-px from JS.
+*/
+.chat-workspace__masthead-brand-align--key-prompt {
+  width: min(100%, calc(var(--chat-brand-row-px, 0px) * 2.25));
+}
+
+.chat-workspace__masthead-brand-align .chat-workspace__masthead {
+  width: 100%;
+  padding-inline: 0;
+}
+
+.chat-workspace__masthead-brand-align .chat-workspace__brand {
+  margin-top: clamp(1rem, 4vh, 2.25rem);
+  align-self: center;
+}
+
+/*
+  Sticky tools row - same background as page (no separate “header band”).
+  Width matches message composer: narrow cap in pre-chat, full hero width when chat chrome is open.
+*/
+.chat-workspace__masthead {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  width: 100%;
+  box-sizing: border-box;
+  padding: max(20px, env(safe-area-inset-top, 0px)) var(--pad-x) 12px;
+  background: transparent;
+}
+
+.chat-workspace__masthead-inner {
+  width: 100%;
+  max-width: min(1040px, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.chat-workspace__masthead-inner--narrow-composer {
+  max-width: min(640px, 100%);
+}
+
+@media (max-width: 520px) {
+  .chat-workspace__masthead-inner {
+    flex-wrap: wrap;
+  }
+}
+
+/*
+  Masthead mode toggle: oval shell like API key pill; two flat halves; split by tint only (no stroke).
+  ~30% narrower than prior max (280→196, 200→140).
+*/
+.app-mode-segmented--chat-masthead {
+  width: auto;
+  min-width: min(108px, 30vw);
+  max-width: min(172px, 29vw);
+  margin: 0;
+  flex: 0 0 auto;
+  height: var(--masthead-toolbar-h);
+  box-sizing: border-box;
+  padding: 0;
+  gap: 0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.app-mode-segmented--chat-masthead .app-mode-segmented__tab {
+  flex: 1 1 50%;
+  min-width: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0 10px;
+  font-size: 12px;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.app-mode-segmented--chat-masthead .app-mode-segmented__tab--chat-icon {
+  flex: 0 0 auto;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-mode-segmented--chat-masthead .app-mode-segmented__tab--redteam-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.app-mode-segmented__tab-icon--continue-chat {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  display: block;
+  /* Same ink as body UI text and masked PNG icons site-wide */
+  background-color: var(--text);
+  mask-image: url('../assets/icons/actions/continue-chat.png');
+  -webkit-mask-image: url('../assets/icons/actions/continue-chat.png');
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+.app-mode-segmented--chat-masthead .app-mode-segmented__tab[aria-selected='true'] {
+  box-shadow: none;
+  background: var(--chrome-current-fill);
+}
+
+.app-mode-segmented--chat-masthead .app-mode-segmented__tab[aria-selected='false'] {
+  background: color-mix(in srgb, var(--text) 5%, var(--input-bg));
+}
+
+.app-mode-segmented--chat-masthead .app-mode-segmented__tab:hover {
+  background: color-mix(in srgb, var(--header-bg) 12%, transparent);
+}
+
+.app-mode-segmented--chat-masthead .app-mode-segmented__tab[aria-selected='true']:hover {
+  background: color-mix(in srgb, var(--text) 4%, var(--chrome-current-fill));
+}
+
+.app-mode-segmented--chat-masthead .app-mode-segmented__tab[aria-selected='false']:hover {
+  background: color-mix(in srgb, var(--text) 8%, var(--input-bg));
+}
+
+/* Section 1 - same capsule + color-only split */
+.app-mode-segmented--header.chrome-pill-surface {
+  padding: 0;
+  gap: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  min-width: min(140px, 32vw);
+  max-width: min(160px, 29vw);
+}
+
+.app-mode-segmented--header.chrome-pill-surface .app-mode-segmented__tab {
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+}
+
+.app-mode-segmented--header.chrome-pill-surface .app-mode-segmented__tab--chat-icon {
+  flex: 0 0 auto;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-mode-segmented--header.chrome-pill-surface .app-mode-segmented__tab--redteam-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 8px;
+}
+
+.app-mode-segmented--header.chrome-pill-surface .app-mode-segmented__tab[aria-selected='true'] {
+  box-shadow: none;
+  background: var(--chrome-current-fill);
+}
+
+.app-mode-segmented--header.chrome-pill-surface .app-mode-segmented__tab[aria-selected='false'] {
+  background: color-mix(in srgb, var(--text) 5%, var(--input-bg));
+}
+
+.app-mode-segmented--header.chrome-pill-surface .app-mode-segmented__tab:hover {
+  background: color-mix(in srgb, var(--header-bg) 12%, transparent);
+}
+
+.app-mode-segmented--header.chrome-pill-surface .app-mode-segmented__tab[aria-selected='true']:hover {
+  background: color-mix(in srgb, var(--text) 4%, var(--chrome-current-fill));
+}
+
+.app-mode-segmented--header.chrome-pill-surface .app-mode-segmented__tab[aria-selected='false']:hover {
+  background: color-mix(in srgb, var(--text) 8%, var(--input-bg));
+}
+
+.chat-workspace__masthead-key {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+}
+
+.chat-workspace__masthead-key-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.chat-workspace__masthead-key-line1 {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.chat-workspace__masthead-key-line1 .chat-workspace__masthead-key-field-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.chat-workspace__masthead-key-stack {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+@keyframes chat-workspace-key-gate-flash {
+  0%,
+  100% {
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 7%, transparent);
+  }
+  25%,
+  75% {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 55%, transparent),
+      0 2px 10px color-mix(in srgb, var(--focus) 20%, transparent);
+  }
+}
+
+.chat-workspace__masthead-key-field-wrap--gate-flash {
+  animation: chat-workspace-key-gate-flash 1.2s ease-out 1;
+  border-radius: 999px;
+}
+
+.chat-workspace__masthead-key-composite {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.chat-workspace__masthead-key-composite--solo {
+  border-radius: 999px;
+}
+
+.chat-workspace__masthead-key-composite--with-provider {
+  border-radius: var(--inner-radius);
+}
+
+.chat-workspace__masthead-key-composite--with-provider .chat-workspace__masthead-key-line1 {
+  border-bottom: 1px solid var(--input-frame-inner);
+}
+
+.chat-workspace__masthead-key-composite--gate-flash {
+  animation: chat-workspace-key-gate-flash 1.2s ease-out 1;
+}
+
+.chat-workspace__masthead-key-field-wrap--embedded {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.chat-workspace__masthead-key-composite--solo .chat-workspace__masthead-key-field-wrap--embedded {
+  border-radius: 999px;
+}
+
+.chat-workspace__masthead-provider-dropdown.filter-dropdown {
+  position: relative;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.chat-workspace__masthead-provider-dropdown .filter-dropdown__trigger {
+  height: var(--masthead-toolbar-h);
+  min-height: var(--masthead-toolbar-h);
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 12px;
+  border-radius: 999px;
+}
+
+.chat-workspace__masthead-provider-dropdown.chat-workspace__masthead-provider-dropdown--attached
+  .filter-dropdown__trigger {
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  background: var(--input-bg);
+}
+
+.chat-workspace__masthead-provider-dropdown--attached.filter-dropdown--open .filter-dropdown__trigger {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Provider panel — drops from below the pill, absolutely positioned, centred */
+.chat-workspace__masthead-key-stack {
+  position: relative;
+}
+
+.chat-workspace__masthead-provider-panel {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  background: var(--input-bg);
+  border: 1px solid var(--input-frame-inner);
+  border-top: none;
+  border-radius: 0 0 var(--inner-radius) var(--inner-radius);
+  min-width: min(320px, 90vw);
+  max-width: min(480px, 95vw);
+  max-height: calc(4 * (11px + 10px) - 14px);
+  overflow-y: auto;
+}
+
+.chat-workspace__masthead-provider-chip {
+  display: block;
+  width: 100%;
+  padding: 5px 12px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #b5aea3;
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  white-space: nowrap;
+}
+
+.chat-workspace__masthead-provider-chip:hover {
+  background: color-mix(in srgb, var(--focus) 10%, var(--input-bg));
+  color: var(--text);
+}
+
+.chat-workspace__masthead-provider-chip--active {
+  color: var(--text);
+  font-weight: 600;
+  background: color-mix(in srgb, var(--focus) 14%, var(--input-bg));
+}
+
+.chat-workspace__masthead-key-field-wrap {
+  min-width: 0;
+  display: flex;
+  border-radius: 999px;
+  width: 100%;
+}
+
+.chat-workspace__masthead-key-field-wrap--custom-base {
+  border-radius: var(--inner-radius);
+}
+
+.chat-workspace__masthead-key-field-wrap--custom-base .chat-workspace__masthead-key-input {
+  border-radius: var(--inner-radius);
+}
+
+.chat-workspace__masthead-key-field-wrap .chat-workspace__masthead-key-input {
+  width: 100%;
+  min-width: 0;
+}
+
+.chat-workspace__masthead-key-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--masthead-toolbar-h);
+  min-height: var(--masthead-toolbar-h);
+  max-height: var(--masthead-toolbar-h);
+  box-sizing: border-box;
+  /* Default; --with-save overrides to flat right edge (no “inner pill” by the button) */
+  border-radius: 999px;
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: calc(var(--masthead-toolbar-h) - 2px);
+  color: #b5aea3;
+}
+
+/* Same ink / weight / size as Chat vs Red Team masthead tabs */
+.chat-workspace__masthead-key-submit {
+  flex: 0 0 auto;
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0 10px;
+  min-width: 0;
+  height: var(--masthead-toolbar-h);
+  min-height: var(--masthead-toolbar-h);
+  max-height: var(--masthead-toolbar-h);
+  box-sizing: border-box;
+  border: none;
+  border-radius: 0 999px 999px 0;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+:root:not([data-theme='dark']) .chat-workspace__masthead-key-submit {
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--save-verify-wash) 20%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash) 7%, transparent) 46%,
+      transparent 100%
+    ),
+    color-mix(in srgb, var(--text) 7%, var(--field-bg));
+}
+
+[data-theme='dark'] .chat-workspace__masthead-key-submit {
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--save-verify-wash-dark) 20%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash-dark) 7%, transparent) 46%,
+      transparent 100%
+    ),
+    color-mix(in srgb, var(--text) 20%, var(--input-bg));
+}
+
+:root:not([data-theme='dark']) .chat-workspace__masthead-key-submit:hover:not(:disabled) {
+  color: var(--text);
+  transform: scale(var(--btn-hover-scale));
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--text) 12%, transparent);
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--save-verify-wash) 27%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash) 10%, transparent) 44%,
+      transparent 100%
+    ),
+    color-mix(in srgb, var(--btn-bg) 34%, var(--input-bg));
+}
+
+.chat-workspace__masthead-key-submit:hover:not(:disabled) {
+  color: var(--text);
+}
+
+[data-theme='dark'] .chat-workspace__masthead-key-submit:hover:not(:disabled) {
+  transform: scale(var(--btn-hover-scale));
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--save-verify-wash-dark) 27%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash-dark) 10%, transparent) 44%,
+      transparent 100%
+    ),
+    color-mix(in srgb, var(--text) 26%, var(--input-bg));
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--text) 16%, transparent),
+    0 2px 10px color-mix(in srgb, #000 45%, transparent);
+}
+
+.chat-workspace__masthead-key-submit:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.chat-workspace__masthead-key-submit:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--focus) 75%, transparent);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+.chat-workspace__key-pill {
+  --key-pill-cap: calc(var(--masthead-toolbar-h) - 2px); /* inner square = outer height minus top+bottom border */
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: var(--masthead-toolbar-h);
+  box-sizing: border-box;
+  padding: 0;
+  border-radius: 999px;
+  width: 100%;
+  min-width: 0;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+/*
+  Sausage ends: square plates edge-to-edge inside the shell mask (full inner height).
+*/
+.chat-workspace__key-pill-check {
+  flex: 0 0 var(--key-pill-cap);
+  width: var(--key-pill-cap);
+  height: var(--key-pill-cap);
+  box-sizing: border-box;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+  background: var(--badge-ok-bg);
+  border: none;
+  border-radius: 0;
+  border-right: 1px solid color-mix(in srgb, color-mix(in srgb, var(--badge-ok-bg) 84%, #000) 55%, transparent);
+}
+
+.chat-workspace__key-pill-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: start;
+  background: var(--input-bg);
+}
+
+.chat-workspace__key-pill-clear {
+  flex: 0 0 var(--key-pill-cap);
+  width: var(--key-pill-cap);
+  height: var(--key-pill-cap);
+  min-width: var(--key-pill-cap);
+  min-height: var(--key-pill-cap);
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--btn-bg) 42%, var(--input-bg));
+  border: none;
+  border-left: 1px solid color-mix(in srgb, var(--card-border) 65%, transparent);
+}
+
+.chat-workspace__key-pill button.chat-workspace__key-pill-clear.btn.btn--icon-action {
+  flex: 0 0 var(--key-pill-cap);
+  width: var(--key-pill-cap);
+  min-width: var(--key-pill-cap);
+  height: var(--key-pill-cap);
+  min-height: var(--key-pill-cap);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--btn-bg) 42%, var(--input-bg));
+  border: none;
+  border-left: 1px solid color-mix(in srgb, var(--card-border) 65%, transparent);
+  box-shadow: none;
+}
+
+.chat-workspace__key-pill-clear .response-action-icon {
+  width: 17px;
+  height: 17px;
+}
+
+/* Same max width as .chat-model-rows - one readable column with the model picker below */
+.chat-workspace__hero {
+  width: 100%;
+  max-width: min(1040px, 100%);
+  margin: 0 auto;
+  padding: 0 var(--pad-x) 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.chat-workspace__brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 1.75rem;
+  /* Nudge logo + title toward the composer without shifting layout for the hero/composer below */
+  transform: translateY(16px);
+}
+
+.chat-workspace__redteam-body {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--chat-workspace-main-block-start-gap) var(--pad-x) 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--redteam-section-stack-gap);
+  align-self: stretch;
+  font-family: var(--font);
+  font-size: var(--fs);
+  line-height: 1.45;
+}
+
+/*
+  Red Team page ink lock: match Chat logo/text color exactly (var(--text))
+  for all copy and icon glyphs inside the Red Team body.
+  Top masthead API-key input stays untouched because it lives outside this scope.
+*/
+.chat-workspace__redteam-body,
+.chat-workspace__redteam-body :not(.provider-icon):not(.provider-icon *) {
+  color: var(--redteam-ink) !important;
+}
+
+.chat-workspace__redteam-body *::placeholder {
+  color: var(--redteam-ink) !important;
+  opacity: 1;
+}
+
+.chat-workspace__redteam-body *::before,
+.chat-workspace__redteam-body *::after {
+  color: var(--redteam-ink) !important;
+}
+
+.chat-workspace__redteam-body :where(svg, svg *, [class*='icon'], [class*='mark']):not(.provider-icon):not(.provider-icon *) {
+  color: var(--redteam-ink) !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+.chat-workspace__redteam-body .response-action-icon {
+  background-color: var(--redteam-ink) !important;
+}
+
+/* Controls that use embedded SVG data URIs (not currentColor) */
+.chat-workspace__redteam-body .filter-dropdown__chevron,
+.chat-workspace__redteam-body .input-row select {
+  background-image: var(--redteam-chevron-icon) !important;
+}
+
+.chat-workspace__redteam-body .privacy-toggle input[type='checkbox']:checked,
+.chat-workspace__redteam-body .model-item input[type='checkbox']:checked {
+  background-color: transparent !important;
+  border-color: var(--redteam-ink) !important;
+  background-image: var(--redteam-check-icon) !important;
+}
+
+/* Button glyphs brighten on hover to the previous tone */
+.chat-workspace__redteam-body button:hover:not(:disabled),
+.chat-workspace__redteam-body button:hover:not(:disabled) * {
+  color: var(--redteam-ink-hover) !important;
+}
+
+.chat-workspace__redteam-body button:hover:not(:disabled)::before,
+.chat-workspace__redteam-body button:hover:not(:disabled)::after {
+  color: var(--redteam-ink-hover) !important;
+}
+
+.chat-workspace__redteam-body button:hover:not(:disabled) :where(svg, svg *, [class*='icon'], [class*='mark']) {
+  color: var(--redteam-ink-hover) !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+.chat-workspace__redteam-body button:hover:not(:disabled) .response-action-icon {
+  background-color: var(--redteam-ink-hover) !important;
+}
+
+/*
+  Red Team: restore semantic reply-status colors (pass / block / unclear / error).
+  The page ink lock above must not flatten these.
+*/
+.chat-workspace__redteam-body .status-icon--pass {
+  color: #3f8a2d !important;
+}
+
+.chat-workspace__redteam-body .status-icon--fail {
+  color: #b3463d !important;
+}
+
+.chat-workspace__redteam-body .status-icon--error {
+  color: #c77b2e !important;
+}
+
+.chat-workspace__redteam-body .status-icon--unknown {
+  color: #b1841f !important;
+}
+
+.chat-workspace__redteam-body .results-summary__badges .badge-pass,
+.chat-workspace__redteam-body .response-badge.badge-pass {
+  color: var(--text) !important;
+  background: color-mix(in srgb, #a8c58b 26%, var(--field-bg)) !important;
+  border-color: color-mix(in srgb, #3f8a2d 38%, var(--card-border)) !important;
+}
+
+.chat-workspace__redteam-body .results-summary__badges .badge-fail,
+.chat-workspace__redteam-body .response-badge.badge-fail {
+  color: var(--text) !important;
+  background: color-mix(in srgb, #cf9389 26%, var(--field-bg)) !important;
+  border-color: color-mix(in srgb, #b3463d 42%, var(--card-border)) !important;
+}
+
+.chat-workspace__redteam-body .results-summary__badges .badge-fail-story,
+.chat-workspace__redteam-body .response-badge.badge-fail-story {
+  color: var(--text) !important;
+  background: color-mix(in srgb, #cf9389 22%, var(--field-bg)) !important;
+  border-color: color-mix(in srgb, #8a4d45 35%, var(--card-border)) !important;
+}
+
+.chat-workspace__redteam-body .results-summary__badges .badge-unknown,
+.chat-workspace__redteam-body .response-badge.badge-unknown {
+  color: var(--text) !important;
+  background: color-mix(in srgb, #e2c97a 28%, var(--field-bg)) !important;
+  border-color: color-mix(in srgb, #b1841f 40%, var(--card-border)) !important;
+}
+
+.chat-workspace__redteam-body .results-summary__badges .badge-error,
+.chat-workspace__redteam-body .response-badge.badge-error {
+  color: var(--text) !important;
+  background: color-mix(in srgb, #e8a854 24%, var(--field-bg)) !important;
+  border-color: color-mix(in srgb, #c77b2e 42%, var(--card-border)) !important;
+}
+
+.chat-workspace__redteam-body .response-card.status-pass {
+  border-left: 3px solid #3f8a2d !important;
+}
+
+.chat-workspace__redteam-body .response-card.status-fail,
+.chat-workspace__redteam-body .response-card.status-fail_story {
+  border-left: 3px solid #b3463d !important;
+}
+
+.chat-workspace__redteam-body .response-card.status-unknown {
+  border-left: 3px solid #c9a227 !important;
+}
+
+.chat-workspace__redteam-body .response-card.status-error {
+  border-left: 3px solid #c77b2e !important;
+}
+
+.chat-workspace__redteam-body .response-error {
+  color: #b3463d !important;
+}
+
+/* Run setup + results: multiple section roots — flex gap separates cards (was touching) */
+.chat-workspace__redteam-section-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--redteam-section-stack-gap);
+  min-width: 0;
+}
+
+/* Red Team: outer glow + inner vignette from message-field fill (--redteam-card-inset-shadow). */
+.chat-workspace__redteam-body .section {
+  border-radius: var(--chat-workspace-shell-radius);
+  border: var(--chat-shell-border);
+  box-shadow: var(--chat-shell-shadow-redteam), var(--redteam-card-inset-shadow);
+  padding-bottom: 20px;
+}
+
+/*
+  Red Team page typography = Chat workspace:
+  - Column + actions: Inter, 14px / 1.45 (composer, .filter-dropdown__trigger, menu options, .btn, text inputs, in-field hints)
+  - Thread-style copy: 12px / 1.45 (thread msg, model row titles, reply windows where not in a control “box”)
+  - API key value fields: mono 14px (same as masthead key)
+*/
+.chat-workspace__redteam-body .section-header {
+  gap: 0.5rem;
+  margin-bottom: calc(1rem - 4px);
+}
+
+.chat-workspace__redteam-body .section-header h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+}
+
+/*
+  Test prompt card: slightly tighter vertical padding than default .section; card-to-card gaps
+  come only from .chat-workspace__redteam-section-stack (same as Select models ↔ Result).
+*/
+.chat-workspace__redteam-body .section.section--prompt-run-stack {
+  padding-top: 18px;
+  padding-bottom: 14px;
+}
+
+.chat-workspace__redteam-body .section.section--prompt-run-stack .scroll-fade-shell--prompt {
+  margin-top: 0;
+}
+
+/*
+  Red Team Test prompt: uniform 8px vertical gaps between main prompt, run name, Prompt library rows,
+  and “Select saved template” row (fixes tight strip between name/tags row and template row).
+*/
+.chat-workspace__redteam-body .section.section--prompt-run-stack .hint.prompt-classify {
+  margin-bottom: 8px;
+}
+
+.chat-workspace__redteam-body .section.section--prompt-run-stack .scroll-fade-shell--prompt-inset-copy {
+  margin-bottom: 8px;
+}
+
+/* Copy control lives inside the prompt field (not the card header) */
+.scroll-fade-shell--prompt-inset-copy {
+  position: relative;
+}
+
+.chat-workspace__redteam-body .section.section--prompt-run-stack .copy-icon-btn--prompt-inset {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  margin-left: 0;
+}
+
+.chat-workspace__redteam-body .section.section--prompt-run-stack .scroll-fade-shell--prompt-inset-copy textarea {
+  padding: 12px 44px 14px 14px;
+}
+
+.chat-workspace__redteam-body .section.section--prompt-run-stack .run-label-row__title {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.chat-workspace__redteam-body .section.section--prompt-run-stack .run-label-row {
+  margin-top: 0;
+}
+
+.chat-workspace__redteam-body .section.section--prompt-run-stack .prompt-library {
+  margin-top: 8px;
+}
+
+.chat-workspace__redteam-body .section.section--prompt-run-stack .prompt-library__title {
+  margin: 0 0 8px;
+}
+
+.chat-workspace__redteam-body .section.section--prompt-run-stack .prompt-library__row {
+  margin-top: 8px;
+}
+
+.chat-workspace__redteam-body .section.section--prompt-run-stack .prompt-mutation-wrap {
+  margin-top: 8px;
+}
+
+.chat-workspace__redteam-body .section.section--prompt-run-stack .run-temperature-wrap {
+  margin-top: 4px;
+}
+
+.chat-workspace__redteam-body .section.section--prompt-run-stack .run-temperature-bar {
+  row-gap: 0.5rem;
+}
+
+.chat-workspace__redteam-body .section.section--prompt-run-stack .run-temperature-bar__scale {
+  padding: 4px 0;
+}
+
+/* Logo mark before card titles — same ink as h2 (currentColor) via mask, like .chat-workspace__logo */
+.chat-workspace__redteam-body .redteam-section-mark {
+  flex-shrink: 0;
+  display: block;
+  height: 0.84em;
+  width: 0.84em;
+  background-color: currentColor;
+  mask-image: url('/logo12.png');
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: url('/logo12.png');
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+.chat-workspace__redteam-body input[type='text'],
+.chat-workspace__redteam-body input[type='search'],
+.chat-workspace__redteam-body input[type='number'],
+.chat-workspace__redteam-body select {
+  font-family: var(--font);
+  font-size: var(--fs);
+  line-height: 1.45;
+}
+
+.chat-workspace__redteam-body .api-key-section__input {
+  font-family: var(--font-mono);
+  font-size: var(--fs);
+  line-height: 1.45;
+}
+
+/*
+  Closed dropdown trigger = same typography as .chat-workspace__composer-input (some UA styles shrink <button> text).
+*/
+.chat-workspace__redteam-body .filter-dropdown .filter-dropdown__trigger,
+.chat-workspace__redteam-body .filter-dropdown__trigger.chrome-pill-surface {
+  font-family: var(--font);
+  font-size: var(--fs);
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.chat-workspace__redteam-body .filter-dropdown__trigger-text {
+  font-family: inherit;
+  font-size: 1em;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+.chat-workspace__redteam-body .filter-dropdown__option {
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+}
+
+/* In-field corner labels (Prompt name / tags / run name) — same ramp as inputs + dropdown triggers */
+.chat-workspace__redteam-body .prompt-library__field-hint,
+.chat-workspace__redteam-body .run-label-field__hint {
+  font-size: var(--fs);
+}
+
+.chat-workspace__redteam-body button.btn {
+  font-family: var(--font);
+  font-size: var(--fs);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.chat-workspace__redteam-body .section textarea,
+.chat-workspace__redteam-body .scroll-fade-shell--prompt textarea {
+  font-family: var(--font);
+  font-size: var(--fs);
+  line-height: 1.45;
+}
+
+.chat-workspace__redteam-body .hint,
+.chat-workspace__redteam-body .privacy-toggle {
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+}
+
+.chat-workspace__redteam-body .run-label-row__title {
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  line-height: 1.35;
+}
+
+/* Model list — match chat window header model chip lines */
+.chat-workspace__redteam-body .model-name {
+  font-size: var(--fs-sm);
+  font-weight: 650;
+  line-height: 1.25;
+  color: var(--text-secondary);
+}
+
+.chat-workspace__redteam-body .model-meta {
+  font-size: calc(var(--fs-sm) * 0.92);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* Results thread blocks — match .chat-workspace__thread-msg-copy */
+.chat-workspace__redteam-body .reply-window,
+.chat-workspace__redteam-body .chat-msg__text {
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+}
+
+.chat-workspace__redteam-body .chat-panel__composer input[type='text'] {
+  font-family: var(--font);
+  font-size: var(--fs);
+  line-height: 1.45;
+}
+
+.chat-workspace__redteam-body .chat-panel__title {
+  font-family: var(--font);
+  font-size: var(--fs);
+  line-height: 1.3;
+}
+
+.chat-workspace__redteam-body .chat-panel__meta {
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  line-height: 1.35;
+}
+
+.chat-workspace__redteam-body .response-title__head h3 {
+  font-family: var(--font);
+  font-size: var(--fs);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.chat-workspace__redteam-body .response-meta {
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  line-height: 1.35;
+}
+
+.chat-workspace__redteam-body .response-error {
+  font-family: var(--font);
+  font-size: var(--fs);
+  line-height: 1.45;
+}
+
+.chat-workspace__redteam-body .results-placeholder,
+.chat-workspace__redteam-body .results-progress {
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+}
+
+.chat-workspace__redteam-body .badge-ok {
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  line-height: 1.2;
+}
+
+.chat-workspace__redteam-body .run-compare__title {
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+  color: var(--text-secondary);
+}
+
+.chat-workspace__redteam-body .run-compare__legend {
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  line-height: 1.35;
+}
+
+.chat-workspace__redteam-body .run-compare__table {
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  line-height: 1.35;
+}
+
+/* Pre-key Red Team: full UI is interactive; model checkboxes no-op until key is saved (see App). */
+
+.chat-workspace__logo {
+  display: block;
+  flex-shrink: 0;
+  height: 28px;
+  width: 28px;
+  background-color: var(--text);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+.chat-workspace__unified-chat-card > .chat-workspace__unified-composer-row:first-child {
+  border-top: none;
+}
+
+.chat-workspace__title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.chat-workspace__composer-shell {
+  width: 100%;
+}
+
+/*
+  Keeps System prompt / New group chat / Explore + composer visible while scrolling the main column
+  (otherwise they sit between transcript and input and scroll off-screen as soon as the thread grows).
+*/
+.chat-workspace__sticky-chat-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  align-self: stretch;
+  width: 100%;
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: max(0.35rem, env(safe-area-inset-bottom, 0px));
+  background: var(--page-bg);
+}
+
+.chat-workspace__sticky-chat-foot--prechat .chat-workspace__composer-shell.chat-workspace__composer-shell--footer {
+  max-width: min(640px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.chat-workspace__sticky-chat-foot--prechat .chat-workspace__unified-chat-shell {
+  max-width: min(640px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.chat-workspace__export-conversation-orb {
+  cursor: pointer;
+}
+
+/* ~15% smaller than prior 20px; matches sidebar orb ink via currentColor (see .chat-workspace__window-orb) */
+.chat-workspace__export-conversation-glyph {
+  display: block;
+  width: 17px;
+  height: 17px;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+.chat-workspace__export-conversation-orb:hover .chat-workspace__export-conversation-glyph {
+  background-color: currentColor;
+}
+
+.chat-workspace__composer-shell--footer {
+  margin-top: var(--chat-workspace-main-block-start-gap);
+}
+
+/* Wraps capsule + external resize grip (same bottom edge as card - no extra band below) */
+.chat-workspace__unified-chat-shell {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Outer window: rounded rect + border; inner header + body separated by 1px */
+.chat-workspace__unified-chat-frame {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 52px;
+  /* Chat page only (this frame is not mounted on Red Team). Slightly rounder than section cards. */
+  border-radius: 24px;
+  border: var(--chat-shell-border);
+  background: var(--input-bg);
+  box-shadow: var(--chat-shell-shadow);
+  overflow: hidden;
+  /* Shared title bar + composer strip: same height, padding, tint, separator color */
+  --chat-chrome-bg: color-mix(in srgb, var(--input-bg) 94%, var(--card-border));
+  --chat-chrome-edge: 1px solid color-mix(in srgb, var(--card-border) 55%, transparent);
+  --chat-chrome-min-h: 52px;
+  --chat-chrome-pad-y: 8px;
+  /* Header, composer, thread orbs: same horizontal inset (thread rows use this token only). */
+  --chat-chrome-pad-x: 12px;
+}
+
+/*
+  Initial hero only (see ChatWorkspace): empty composer - hover matches .chat-model-chip__avatar
+  (slight scale + shadow in light, softer glow in dark). Narrower scale than 40px chips so the bar does not jump.
+*/
+.chat-workspace__unified-chat-frame--prechat-prompt-hover {
+  transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+}
+
+.chat-workspace__unified-chat-frame--prechat-prompt-hover:hover {
+  /* +1.4% linear scale (was 2%; 30% less growth) - keeps 1px hairline calmer */
+  transform: scale(1.014);
+  border: 1px solid
+    color-mix(
+      in srgb,
+      color-mix(in srgb, var(--focus) 35%, var(--card-border)) 72%,
+      transparent
+    );
+}
+
+html:not([data-theme='dark']) .chat-workspace__unified-chat-frame--prechat-prompt-hover:hover {
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--text) 12%, transparent);
+}
+
+[data-theme='dark'] .chat-workspace__unified-chat-frame--prechat-prompt-hover:hover {
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--text) 16%, transparent),
+    0 2px 10px color-mix(in srgb, #000 45%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-workspace__unified-chat-frame--prechat-prompt-hover,
+  .chat-workspace__unified-chat-frame--prechat-prompt-hover:hover {
+    transform: none;
+    transition: border-color 0.14s ease, box-shadow 0.14s ease;
+  }
+}
+
+.chat-workspace__chat-window-header {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  box-sizing: border-box;
+  min-height: var(--chat-chrome-min-h);
+  padding: var(--chat-chrome-pad-y) var(--chat-chrome-pad-x);
+  border-bottom: var(--chat-chrome-edge);
+  background: var(--chat-chrome-bg);
+}
+
+.chat-workspace__chat-window-header-models {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 6px 2px 0;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chat-workspace__header-model-chip {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  max-width: min(260px, 56vw);
+}
+
+button.chat-workspace__header-model-chip {
+  border: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+button.chat-workspace__header-model-chip:focus-visible {
+  outline: none;
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 45%, transparent);
+}
+
+/* Model glyph orbit: same 36px footprint and border as header window orbs */
+.chat-workspace__header-model-icon-orb {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  background: var(--input-bg);
+}
+
+.chat-workspace__header-model-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-workspace__header-model-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.chat-workspace__header-model-line1 {
+  font-size: var(--fs-sm);
+  font-weight: 650;
+  line-height: 1.25;
+  /* Match left sidebar nav orb label / icon ink (not full --text) */
+  color: var(--text-secondary);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-workspace__header-model-line2 {
+  font-size: calc(var(--fs-sm) * 0.92);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-secondary);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-workspace__chat-window-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.chat-workspace__header-add-model {
+  flex-shrink: 0;
+  width: var(--chat-sidebar-orb-size);
+  height: var(--chat-sidebar-orb-size);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    color 0.12s ease,
+    transform 0.12s ease;
+}
+
+.chat-workspace__header-add-model:hover {
+  border-color: color-mix(in srgb, var(--focus) 40%, var(--card-border));
+  color: var(--text);
+  transform: scale(var(--btn-hover-scale));
+}
+
+.chat-workspace__header-add-model:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 45%, transparent);
+}
+
+/** Thin “+” stroke (same glyph as add model); wins over .chat-workspace__svg size when both classes apply. */
+.chat-workspace__orb-plus-svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+
+.chat-workspace__window-orb {
+  flex-shrink: 0;
+  width: var(--chat-sidebar-orb-size);
+  height: var(--chat-sidebar-orb-size);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  border-radius: 50%;
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    color 0.12s ease,
+    transform 0.12s ease;
+}
+
+.chat-workspace__window-orb:hover {
+  border-color: color-mix(in srgb, var(--focus) 40%, var(--card-border));
+  color: var(--text);
+  transform: scale(var(--btn-hover-scale));
+}
+
+.chat-workspace__window-orb--close:hover {
+  color: var(--danger, #e85d5d);
+}
+
+.chat-workspace__window-orb:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 45%, transparent);
+}
+
+.chat-workspace__window-orb--active {
+  border-color: color-mix(in srgb, var(--focus) 45%, var(--card-border));
+  background: color-mix(in srgb, var(--focus) 12%, var(--input-bg));
+  color: var(--text);
+}
+
+.chat-workspace__window-orb-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+
+.chat-workspace__window-orb-icon.chat-workspace__svg {
+  display: block;
+}
+
+/*
+  Hue sheen on hover/focus (same idea as .chat-model-chip__avatar): --chat-orb-sheen from
+  chatOrbSheenStyle(), or --model-chip-sheen on header model orbs via modelChipSheenStyle().
+  Use .workspace-ui-sheen + style={chatOrbSheenStyle('stable-key')} on Red Team / masthead buttons.
+*/
+.chat-workspace__sheen-orb,
+.chat-workspace__sheen-orb--delegated,
+.workspace-ui-sheen {
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-workspace__sheen-orb::before,
+.chat-workspace__sheen-orb--delegated::before,
+.workspace-ui-sheen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--chat-orb-sheen, var(--model-chip-sheen, none));
+  opacity: 0;
+  transition: opacity 0.14s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.chat-workspace__sheen-orb:hover:not(:disabled)::before,
+.chat-workspace__sheen-orb:focus-visible:not(:disabled)::before,
+.workspace-ui-sheen:hover:not(:disabled)::before,
+.workspace-ui-sheen:focus-visible:not(:disabled)::before {
+  opacity: 1;
+}
+
+html:not([data-theme='dark']) .chat-workspace__sheen-orb:hover:not(:disabled)::before,
+html:not([data-theme='dark']) .chat-workspace__sheen-orb:focus-visible:not(:disabled)::before,
+html:not([data-theme='dark']) .workspace-ui-sheen:hover:not(:disabled)::before,
+html:not([data-theme='dark']) .workspace-ui-sheen:focus-visible:not(:disabled)::before {
+  opacity: 0.9;
+}
+
+button.chat-workspace__header-model-chip:hover .chat-workspace__sheen-orb--delegated::before,
+button.chat-workspace__header-model-chip:focus-visible .chat-workspace__sheen-orb--delegated::before {
+  opacity: 1;
+}
+
+html:not([data-theme='dark']) button.chat-workspace__header-model-chip:hover .chat-workspace__sheen-orb--delegated::before,
+html:not([data-theme='dark']) button.chat-workspace__header-model-chip:focus-visible .chat-workspace__sheen-orb--delegated::before {
+  opacity: 0.9;
+}
+
+.chat-workspace__sheen-orb > *,
+.chat-workspace__sheen-orb--delegated > *,
+.workspace-ui-sheen > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Sidebar history count badge is positioned outside the orb; default sheen clip would hide it */
+.chat-workspace__nav-btn.chat-workspace__sheen-orb:has(.chat-workspace__nav-badge) {
+  overflow: visible;
+}
+
+/*
+  .sheen-orb sets position:relative for ::before sheen — that rule loads later and was overriding
+  .history-item-remove’s position:absolute, so dismiss buttons flowed in layout (bottom-left).
+*/
+.chat-workspace__history-item-remove.chat-workspace__sheen-orb {
+  position: absolute;
+}
+
+/* Thread + composer only (no outer border - frame provides it) */
+.chat-workspace__unified-chat-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* max-height controlled inline (default matches former min(45vh, 420px)) */
+.chat-workspace__unified-thread {
+  --thread-edge-fade: 40px;
+  --thread-band-text-max: 520px;
+  --thread-band-row-pad-y: var(--chat-chrome-pad-x);
+  --thread-band-user-bg: color-mix(in srgb, var(--focus) 16%, var(--input-bg));
+  --thread-band-model-bg: color-mix(in srgb, var(--text) 5.5%, var(--input-bg));
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* Horizontal inset comes only from each thread line (same token as header / composer). */
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--input-bg);
+  gap: 0;
+  scrollbar-width: thin;
+
+  /*
+    Edge fade: same tonal blend as before, but only three stops — no hard clip.
+    “Gray” at chrome = 60% / 40% / 0% opacity → mask alpha = 1 − that (thread visibility).
+  */
+  --thread-edge-mask-chrome: 0.4; /* 60% veil at header/footer */
+  --thread-edge-mask-mid: 0.6; /* 40% veil */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, var(--thread-edge-mask-chrome)) 0,
+    rgba(0, 0, 0, var(--thread-edge-mask-mid)) calc(var(--thread-edge-fade) * 0.55),
+    #000 var(--thread-edge-fade),
+    #000 calc(100% - var(--thread-edge-fade)),
+    rgba(0, 0, 0, var(--thread-edge-mask-mid)) calc(100% - var(--thread-edge-fade) * 0.55),
+    rgba(0, 0, 0, var(--thread-edge-mask-chrome)) 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, var(--thread-edge-mask-chrome)) 0,
+    rgba(0, 0, 0, var(--thread-edge-mask-mid)) calc(var(--thread-edge-fade) * 0.55),
+    #000 var(--thread-edge-fade),
+    #000 calc(100% - var(--thread-edge-fade)),
+    rgba(0, 0, 0, var(--thread-edge-mask-mid)) calc(100% - var(--thread-edge-fade) * 0.55),
+    rgba(0, 0, 0, var(--thread-edge-mask-chrome)) 100%
+  );
+  mask-mode: alpha;
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+}
+
+/* Hairline gap: shows parent (--input-bg) between bands. */
+.chat-workspace__unified-thread > * + * {
+  margin-top: 1px;
+}
+
+.chat-workspace__thread-line {
+  width: 100%;
+}
+
+/* User row: content + orb grouped on the right; same vertical padding and gap as model. */
+.chat-workspace__thread-line--user {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+  padding: var(--thread-band-row-pad-y) var(--chat-chrome-pad-x);
+  box-sizing: border-box;
+  background: var(--thread-band-user-bg);
+}
+
+.chat-workspace__thread-line--assistant {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+  padding: var(--thread-band-row-pad-y) var(--chat-chrome-pad-x);
+  box-sizing: border-box;
+  background: var(--thread-band-model-bg);
+}
+
+.chat-workspace__thread-line__content {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-workspace__thread-line--user .chat-workspace__thread-line__content {
+  align-items: flex-end;
+}
+
+.chat-workspace__thread-line--assistant .chat-workspace__thread-line__content {
+  align-items: flex-start;
+}
+
+/* Between consecutive model replies: 1px rule matching unified chat frame border */
+.chat-workspace__unified-thread
+  > .chat-workspace__thread-line--assistant.chat-workspace__thread-line--model-reply-continues {
+  border-top: 1px solid color-mix(in srgb, var(--card-border) 92%, transparent);
+  padding-top: 0.65rem;
+}
+
+.chat-workspace__thread-line--assistant .chat-workspace__thread-persona-orb {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin: 0;
+}
+
+.chat-workspace__thread-ai-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 32px;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin: 0;
+}
+
+/* Short replies: content column is only as wide as text — without this, actions sit beside the text */
+.chat-workspace__thread-line--assistant .chat-workspace__thread-ai-actions {
+  margin-left: auto;
+}
+
+.chat-workspace__thread-regenerate,
+.chat-workspace__thread-copy-msg,
+.chat-workspace__thread-clear-msg {
+  float: none;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    color 0.12s ease,
+    opacity 0.12s ease,
+    transform 0.14s ease,
+    box-shadow 0.14s ease;
+}
+
+.chat-workspace__thread-regenerate:hover:not(:disabled),
+.chat-workspace__thread-copy-msg:hover:not(:disabled),
+.chat-workspace__thread-clear-msg:hover:not(:disabled) {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--focus) 40%, var(--card-border));
+  transform: scale(1.04);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--text) 10%, transparent);
+}
+
+.chat-workspace__thread-regenerate:focus-visible,
+.chat-workspace__thread-copy-msg:focus-visible,
+.chat-workspace__thread-clear-msg:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 45%, transparent);
+}
+
+.chat-workspace__thread-regenerate:disabled,
+.chat-workspace__thread-copy-msg:disabled,
+.chat-workspace__thread-clear-msg:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.chat-workspace__thread-regenerate--busy {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.chat-workspace__thread-regenerate-glyph {
+  width: 18px;
+  height: 18px;
+  display: block;
+  background-color: currentColor;
+  mask-image: url('../assets/icons/actions/reload.png');
+  -webkit-mask-image: url('../assets/icons/actions/reload.png');
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+.chat-workspace__thread-copy-msg-glyph {
+  position: relative;
+  left: 1px;
+  width: 18px;
+  height: 18px;
+  display: block;
+  background-color: currentColor;
+  mask-image: url('../assets/icons/actions/copy.png');
+  -webkit-mask-image: url('../assets/icons/actions/copy.png');
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+.chat-workspace__thread-clear-msg-glyph {
+  width: 18px;
+  height: 18px;
+  display: block;
+  background-color: currentColor;
+  mask-image: url('../assets/icons/actions/clear2.png');
+  -webkit-mask-image: url('../assets/icons/actions/clear2.png');
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+/*
+  User row: message / inline edit + persona orb — keyline ~30% softer than base persona orb.
+  Vertical breathing comes from row padding (symmetric with model); no extra orb tail.
+*/
+.chat-workspace__thread-line--user .chat-workspace__thread-persona-orb {
+  float: none;
+  margin: 0;
+  flex-shrink: 0;
+  align-self: flex-start;
+  border: 1px solid
+    color-mix(
+      in srgb,
+      color-mix(in srgb, var(--card-border) 85%, transparent) 70%,
+      transparent
+    );
+}
+
+[data-theme='dark'] .chat-workspace__thread-line--user .chat-workspace__thread-persona-orb {
+  border: 1px solid
+    color-mix(
+      in srgb,
+      color-mix(in srgb, var(--text-secondary) 42%, var(--card-border)) 70%,
+      transparent
+    );
+}
+
+.chat-workspace__thread-persona-orb {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  background: var(--input-bg);
+  color: var(--text-secondary);
+}
+
+.chat-workspace__thread-model-orb-icon {
+  display: block;
+}
+
+.chat-workspace__thread-user-orb-svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+}
+
+/* Same typography for user and model messages */
+.chat-workspace__thread-msg-copy {
+  margin: 0;
+  min-width: 0;
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text);
+}
+
+.chat-workspace__thread-msg-inline-img {
+  display: block;
+  max-width: min(100%, var(--thread-band-text-max, 520px));
+  height: auto;
+  margin: 1px 0 0.45rem;
+  border-radius: 8px;
+}
+
+.chat-workspace__thread-msg-inline-video {
+  display: block;
+  max-width: min(100%, var(--thread-band-text-max, 520px));
+  max-height: 320px;
+  height: auto;
+  margin: 0.45rem 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--text) 6%, var(--input-bg));
+}
+
+.chat-workspace__thread-msg-inline-audio {
+  display: block;
+  width: min(100%, var(--thread-band-text-max, 520px));
+  margin: 0.45rem 0;
+}
+
+.chat-workspace__thread-line--assistant .chat-workspace__thread-msg-copy {
+  text-align: left;
+}
+
+.chat-workspace__thread-line--user .chat-workspace__thread-msg-copy {
+  text-align: right;
+  min-height: 32px;
+}
+
+/*
+  User line: looks like plain thread text until focus; pill (model-area fill) only while editing.
+*/
+.chat-workspace__thread-user-msg-inline {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text);
+  text-align: right;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  resize: none;
+  field-sizing: content;
+  /* Match 32px persona orb min band — model single-line row uses same orb height */
+  min-height: 32px;
+  overflow: hidden;
+  box-shadow: none;
+  transition:
+    background-color 0.12s ease,
+    padding 0.12s ease,
+    border-radius 0.12s ease;
+}
+
+.chat-workspace__thread-user-msg-inline::placeholder {
+  color: var(--text-secondary);
+}
+
+.chat-workspace__thread-user-msg-inline:focus:not(:read-only),
+.chat-workspace__thread-user-msg-inline:focus-visible:not(:read-only) {
+  outline: none;
+  border: none;
+  box-shadow: none;
+  background: var(--input-bg);
+  padding: 0.45rem 0.75rem;
+  border-radius: 16px;
+}
+
+.chat-workspace__thread-user-msg-inline:read-only {
+  opacity: 0.65;
+  cursor: not-allowed;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+.chat-workspace__thread-user-msg-inline:read-only:focus,
+.chat-workspace__thread-user-msg-inline:read-only:focus-visible {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.chat-workspace__unified-loading {
+  margin: 0;
+  padding: 0 var(--chat-chrome-pad-x);
+  text-align: center;
+}
+
+.chat-workspace__unified-composer-row {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  min-height: var(--chat-chrome-min-h, 52px);
+  /*
+    Optical balance: textarea + trailing icons felt inset farther on the right (frame radius + pad).
+    Slightly less padding-inline-end than start so Send aligns closer to the bottom corner curve.
+  */
+  padding: var(--chat-chrome-pad-y, 8px) max(6px, calc(var(--chat-chrome-pad-x, 12px) - 4px))
+    var(--chat-chrome-pad-y, 8px) var(--chat-chrome-pad-x, 12px);
+  border-top: var(--chat-chrome-edge, 1px solid color-mix(in srgb, var(--card-border) 55%, transparent));
+  background: var(--chat-chrome-bg, color-mix(in srgb, var(--input-bg) 94%, var(--card-border)));
+}
+
+.chat-workspace__composer-pill {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  min-height: 52px;
+  padding: 8px 12px;
+  /*
+    Fixed radius - identical for chat row and tall system-prompt box.
+    (border-radius: 999px on multi-line fields clamps to huge corner radii; looks nothing like the 52px-tall bar.)
+  */
+  border-radius: var(--chat-workspace-shell-radius);
+  border: var(--chat-shell-border);
+  background: var(--input-bg);
+  box-shadow: var(--chat-shell-shadow);
+}
+
+/* System prompt body sits under title bar - frame already has border and bottom rounding */
+.chat-workspace__unified-chat-frame > .chat-workspace__composer-pill.chat-workspace__system-prompt-pill {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  flex: 1 1 auto;
+  min-height: 120px;
+}
+
+.chat-workspace__composer-icon {
+  flex-shrink: 0;
+  align-self: center;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.chat-workspace__composer-icon:hover:not(:disabled) {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  transform: scale(var(--btn-hover-scale));
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--text) 12%, transparent);
+}
+
+[data-theme='dark'] .chat-workspace__composer-icon:hover:not(:disabled) {
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--text) 16%, transparent),
+    0 2px 10px color-mix(in srgb, #000 45%, transparent);
+}
+
+.chat-workspace__composer-icon:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 45%, transparent);
+}
+
+.chat-workspace__composer-icon--listening {
+  color: var(--focus);
+  background: color-mix(in srgb, var(--focus) 14%, transparent);
+}
+
+.chat-workspace__composer-mentions {
+  flex: 0 1 auto;
+  align-self: center;
+  min-width: 36px;
+  max-width: min(320px, 46vw);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/*
+  Pre-chat only (mentions strip holds @ pick-models): glyph was visually right-heavy in 24×24 viewBox.
+  Slightly larger + nudge left for optical center - scoped under .composer-mentions so other composer icons stay 22px.
+*/
+.chat-workspace__composer-mentions .chat-workspace__composer-icon .chat-workspace__svg {
+  width: 26px;
+  height: 26px;
+  display: block;
+  transform: translateX(-2px);
+}
+
+.chat-workspace__composer-model-strip {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 0;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Logo-only circles (no labels) - tap to remove from group */
+.chat-workspace__composer-model-orb {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  border-radius: 50%;
+  background: var(--input-bg);
+  cursor: pointer;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease, transform 0.12s ease;
+}
+
+.chat-workspace__composer-model-orb:hover {
+  border-color: color-mix(in srgb, var(--focus) 40%, var(--card-border));
+  transform: scale(var(--btn-hover-scale));
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--text) 12%, transparent);
+}
+
+[data-theme='dark'] .chat-workspace__composer-model-orb:hover {
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--text) 16%, transparent),
+    0 2px 10px color-mix(in srgb, #000 45%, transparent);
+}
+
+.chat-workspace__composer-model-orb:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 45%, transparent);
+}
+
+.chat-workspace__composer-model-orb-icon {
+  display: block;
+}
+
+.chat-workspace__composer-field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.chat-workspace__composer-input {
+  width: 100%;
+  margin: 0;
+  padding: 8px 8px;
+  border: none;
+  background: transparent;
+  font-family: var(--font);
+  font-size: var(--fs);
+  line-height: 1.45;
+  color: var(--text);
+  text-align: start;
+  resize: none;
+  min-height: 24px;
+  max-height: 160px;
+  field-sizing: content;
+}
+
+.chat-workspace__composer-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.chat-workspace__composer-input:focus {
+  outline: none;
+}
+
+.chat-workspace__composer-send {
+  flex-shrink: 0;
+  align-self: center;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--input-bg);
+  cursor: pointer;
+  transition:
+    opacity 0.12s ease,
+    background 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease,
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+/*
+  Active Send: base = same fill as .chat-workspace__logo (var(--text)); overlay = pale green only
+  (--save-verify-wash / *-dark + transparent — no gray or cream in the gradient). Arrow: dark glyph.
+*/
+:root:not([data-theme='dark']) .chat-workspace__composer-send:not(:disabled) {
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--save-verify-wash) 26%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash) 11%, transparent) 42%,
+      transparent 100%
+    ),
+    var(--text);
+  border: 1px solid color-mix(in srgb, var(--save-verify-wash) 32%, var(--card-border));
+  color: var(--provider-icon-fallback);
+}
+
+[data-theme='dark'] .chat-workspace__composer-send:not(:disabled) {
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--save-verify-wash-dark) 28%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash-dark) 12%, transparent) 42%,
+      transparent 100%
+    ),
+    var(--text);
+  border: 1px solid color-mix(in srgb, var(--save-verify-wash-dark) 38%, color-mix(in srgb, var(--text) 22%, var(--card-border)));
+  color: var(--page-bg);
+}
+
+:root:not([data-theme='dark']) .chat-workspace__composer-send:not(:disabled):hover {
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--save-verify-wash) 34%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash) 14%, transparent) 40%,
+      transparent 100%
+    ),
+    var(--text);
+  border-color: color-mix(in srgb, var(--save-verify-wash) 42%, var(--card-border));
+  color: var(--provider-icon-fallback);
+}
+
+[data-theme='dark'] .chat-workspace__composer-send:not(:disabled):hover {
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--save-verify-wash-dark) 36%, transparent) 0%,
+      color-mix(in srgb, var(--save-verify-wash-dark) 15%, transparent) 40%,
+      transparent 100%
+    ),
+    var(--text);
+  border-color: color-mix(in srgb, var(--save-verify-wash-dark) 48%, color-mix(in srgb, var(--text) 28%, var(--card-border)));
+  color: var(--page-bg);
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--text) 16%, transparent),
+    0 2px 10px color-mix(in srgb, #000 45%, transparent);
+}
+
+.chat-workspace__composer-send:not(:disabled):hover {
+  transform: scale(var(--btn-hover-scale));
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--text) 12%, transparent);
+}
+
+.chat-workspace__composer-send:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 55%, transparent);
+}
+
+.chat-workspace__composer-send .chat-workspace__svg {
+  width: 21px;
+  height: 21px;
+  stroke: currentColor;
+}
+
+/*
+  Sibling of .unified-chat-card; bottom/right line up with the card’s outer bottom edge
+  (triangle sits outside the rounded rect, completing the corner - not below it).
+*/
+.chat-workspace__composer-corner-grip {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  bottom: 0;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: ns-resize;
+}
+
+.chat-workspace__composer-corner-grip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 45%, transparent);
+}
+
+.chat-workspace__composer-corner-grip::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 8px 8px;
+  border-color: transparent transparent color-mix(in srgb, var(--text-secondary) 38%, transparent) transparent;
+  pointer-events: none;
+}
+
+.chat-workspace__composer-corner-grip:hover::after {
+  border-bottom-color: color-mix(in srgb, var(--text-secondary) 55%, transparent);
+}
+
+.chat-workspace__pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+  background: color-mix(in srgb, var(--card-bg) 88%, var(--page-bg));
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.chat-workspace__pill-btn:hover {
+  background: var(--card-bg);
+  border-color: var(--card-border);
+}
+
+.chat-workspace__pill-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 45%, transparent);
+}
+
+.chat-workspace__pill-btn-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.chat-workspace__pill-btn--active {
+  border-color: color-mix(in srgb, var(--focus) 45%, var(--card-border));
+  background: color-mix(in srgb, var(--focus) 12%, var(--card-bg));
+}
+
+.chat-workspace__thread-msg-copy--error {
+  color: var(--danger, #e85d5d);
+  font-weight: 600;
+}
+
+.chat-workspace__system-prompt-shell {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.chat-workspace__system-prompt-pill {
+  width: 100%;
+  /* Clip textarea glyphs to the pill mask (avoids letter fragments past rounded corners) */
+  overflow: hidden;
+}
+
+/* Extra inset so text stays clear of the curved ends (narrower “inner” band vs outer capsule) */
+.chat-workspace__composer-pill.chat-workspace__system-prompt-pill {
+  padding: 12px clamp(18px, 5vw, 28px);
+}
+
+.chat-workspace__system-prompt-pill .chat-workspace__composer-field {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  align-items: stretch;
+}
+
+/* Chat system prompt pill: mono / compact — distinct from main composer and Red Team prompt (see .chat-workspace__redteam-body .section textarea) */
+.chat-workspace__system-prompt-pill .chat-workspace__composer-input {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* Same footprint as chat row when empty; grows when user types (rows + modifier) */
+.chat-workspace__system-prompt-pill--has-text .chat-workspace__composer-input {
+  min-height: 5rem;
+  resize: none;
+  padding-top: 4px;
+  padding-bottom: 12px;
+  box-sizing: border-box;
+}
+
+.chat-workspace__composer-send:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  border: none;
+}
+
+/* Poe-style horizontal model picks - circular avatars */
+.chat-model-rows {
+  width: 100%;
+  max-width: min(1040px, 100%);
+  margin: calc(2rem - 30px) auto 0;
+  padding: 0 var(--pad-x) 2.5rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: calc(1.85rem / 3);
+}
+
+.chat-model-rows--loading,
+.chat-model-rows--empty {
+  margin-top: calc(2rem - 30px);
+  padding: 0 var(--pad-x) 2rem;
+  text-align: center;
+}
+
+.chat-model-rows__loading-msg,
+.chat-model-rows__empty-msg {
+  margin: 0;
+}
+
+.chat-model-rows__section {
+  min-width: 0;
+}
+
+.chat-model-rows__section--mention-empty .chat-model-rows__head {
+  margin-bottom: 0.25rem;
+}
+
+.chat-model-rows__empty-mention {
+  margin: 0;
+  padding: 0 0.15rem 0.15rem;
+}
+
+.chat-model-rows__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: calc(0.55rem - 10px);
+}
+
+.chat-model-rows__title {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.03em;
+  text-transform: none;
+}
+
+.chat-model-rows__title-count {
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+.chat-model-rows__see-all {
+  margin: 0;
+  padding: 0.12rem 0;
+  border: none;
+  background: transparent;
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  opacity: 1;
+  text-align: right;
+  transition: color 0.12s ease;
+}
+
+.chat-model-rows__see-all:hover {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.chat-model-rows__see-all:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--focus) 55%, transparent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.chat-model-rows__see-all--open {
+  color: var(--focus);
+}
+
+.chat-model-rows__expand-panel {
+  margin-top: 0.65rem;
+  padding: 0.75rem 0.65rem 0.85rem;
+  max-height: min(55vh, 420px);
+  overflow: auto;
+  border: 1px solid var(--card-border);
+  border-radius: var(--inner-radius);
+  background: color-mix(in srgb, var(--input-bg) 30%, var(--page-bg));
+  box-shadow: var(--card-drop-shadow);
+}
+
+.chat-model-rows__expand-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 0.65rem 0.45rem;
+  justify-items: center;
+}
+
+.chat-model-rows__expand-cell {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.chat-model-rows__strip {
+  --chat-model-edge-fade: 30px;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Fade chips into page bg at scroll edges (icons slide “under” soft vignette, not hard clip) */
+.chat-model-rows__strip::before,
+.chat-model-rows__strip::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--chat-model-edge-fade);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.chat-model-rows__strip::before {
+  left: 0;
+  background: linear-gradient(to right, var(--page-bg), transparent);
+}
+
+.chat-model-rows__strip::after {
+  right: 0;
+  background: linear-gradient(to left, var(--page-bg), transparent);
+}
+
+.chat-model-rows__track {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 0.65rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem 42px 0.5rem 42px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--card-border) 70%, transparent) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chat-model-rows__track::-webkit-scrollbar {
+  height: 6px;
+}
+
+.chat-model-rows__track::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--card-border) 85%, transparent);
+  border-radius: 999px;
+}
+
+.chat-model-rows__cell {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+.chat-model-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  width: 76px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.chat-model-chip--needs-key {
+  opacity: 0.58;
+  cursor: pointer;
+}
+
+.chat-model-chip--needs-key .chat-model-chip__label {
+  opacity: 0.92;
+}
+
+.chat-model-chip:focus-visible {
+  outline: none;
+}
+
+.chat-model-chip:focus-visible .chat-model-chip__avatar {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 45%, transparent);
+}
+
+.chat-model-chip--selected .chat-model-chip__avatar {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 55%, transparent);
+}
+
+.chat-model-chip--selected .chat-model-chip__label {
+  color: var(--focus);
+  font-weight: 700;
+}
+
+/* 40px circle = .chat-workspace__composer-send; inner brand glyph scaled up for readability */
+.chat-model-chip__avatar {
+  position: relative;
+  overflow: hidden;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--input-bg);
+  border: 1px solid color-mix(in srgb, var(--input-frame-inner) 92%, transparent);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 7%, transparent);
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+
+/* Light theme only: 1px keyline (focus-tinted); ~30% more transparent for test */
+html:not([data-theme='dark']) .chat-model-chip__avatar {
+  border: 1px solid
+    color-mix(
+      in srgb,
+      color-mix(in srgb, var(--focus) 28%, var(--card-border)) 70%,
+      transparent
+    );
+}
+
+/* Single-hue 45° sheen (transparent → 20% opacity, per-model --model-chip-sheen); under glyph */
+.chat-model-chip__avatar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--model-chip-sheen, none);
+  opacity: 0;
+  transition: opacity 0.14s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.chat-model-chip:hover .chat-model-chip__avatar::before {
+  opacity: 1;
+}
+
+/* Light only: diagonal sheen ~10% more transparent (layer alpha 0.9 vs 1) */
+html:not([data-theme='dark']) .chat-model-chip:hover .chat-model-chip__avatar::before {
+  opacity: 0.9;
+}
+
+.chat-model-chip:hover .chat-model-chip__avatar {
+  transform: scale(var(--btn-hover-scale));
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--text) 12%, transparent);
+}
+
+.chat-model-chip__icon {
+  position: relative;
+  z-index: 1;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-model-chip__label {
+  font-size: 11px;
+  line-height: 1.3;
+  font-weight: 500;
+  /* Slightly lift from secondary (pre-key / model picker) without matching body text */
+  color: color-mix(in srgb, var(--text-secondary) 91%, var(--text) 9%);
+  text-align: center;
+  max-width: 76px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.chat-model-rows__fab-prev,
+.chat-model-rows__fab-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  box-shadow: var(--card-drop-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text);
+  z-index: 2;
+  transition: opacity 0.12s ease;
+}
+
+.chat-model-rows__fab-prev {
+  left: 2px;
+}
+
+.chat-model-rows__fab-next {
+  right: 2px;
+}
+
+.chat-model-rows__fab-prev:hover:not(:disabled),
+.chat-model-rows__fab-next:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.chat-model-rows__fab-prev:focus-visible,
+.chat-model-rows__fab-next:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 45%, transparent);
+}
+
+.chat-model-rows__fab-prev:disabled,
+.chat-model-rows__fab-next:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.chat-model-rows__chevron-svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 520px) {
+  .chat-model-rows__fab-prev,
+  .chat-model-rows__fab-next {
+    width: 30px;
+    height: 30px;
+  }
+
+  .chat-model-rows__track {
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+}
+
+/* ─── Mobile: prompt textarea resizable + run spacing ───────────────────── */
+@media (max-width: 720px) {
+  /* Override base overflow:hidden so the resize handle works */
+  .scroll-fade-shell.scroll-fade-shell--prompt {
+    overflow: visible;
+  }
+
+  /* Show the resize handle */
+  .scroll-fade-shell.scroll-fade-shell--prompt textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  /* Fade overlay is pointless when the field is resizable */
+  .scroll-fade-shell.scroll-fade-shell--prompt .scroll-fade-shell__fade {
+    display: none;
+  }
+
+  /* 2px extra gap between Run Name field and the Run button bar */
+  .run-temperature-bar {
+    margin-top: 2px;
+  }
+
+  /* Results summary: cut the gap between action buttons and first result card in half */
+  .results-summary {
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+/* ─── Mobile sidebar: vertical rail → horizontal topbar ─────────────────── */
+@media (max-width: 720px) {
+  /* Root: stack topbar above main instead of side-by-side */
+  .chat-workspace {
+    flex-direction: column;
+  }
+
+  /* Sidebar becomes a full-width horizontal bar */
+  .chat-workspace__sidebar {
+    flex: 0 0 56px;
+    width: 100%;
+    height: 56px;
+    flex-direction: row;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 0 max(8px, env(safe-area-inset-left, 0px)) 0 max(8px, env(safe-area-inset-right, 0px));
+    background: linear-gradient(
+      90deg,
+      var(--input-bg) 0%,
+      color-mix(in srgb, var(--input-bg) 60%, transparent) 100%
+    );
+  }
+
+  /* Right border → bottom border */
+  .chat-workspace__sidebar::after {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      var(--card-border) 0%,
+      color-mix(in srgb, var(--card-border) 20%, var(--page-bg) 80%) 100%
+    );
+  }
+
+  /* Flatten all sub-containers so every orb is a direct sidebar child */
+  .chat-workspace__sidebar-top-slot,
+  .chat-workspace__sidebar-billing,
+  .chat-workspace__nav {
+    display: contents;
+  }
+
+  /* Distribute all orbs evenly across the full width */
+  .chat-workspace__sidebar {
+    justify-content: space-evenly;
+    align-items: center;
+  }
+
+  /* Drawers open below the topbar, full-width */
+  .chat-workspace__history-drawer,
+  .chat-workspace__dev-drawer {
+    top: 56px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 4px 24px color-mix(in srgb, #000 25%, transparent);
+    border-right: none;
+    border-bottom: none;
   }
 }
 

@@ -96,9 +96,9 @@ export function computeOutputPriceTertileLabels(
 
   if (n === 0) {
     return {
-      economy: '—',
-      standard: '—',
-      premium: '—',
+      economy: '-',
+      standard: '-',
+      premium: '-',
     }
   }
 
@@ -117,12 +117,12 @@ export function computeOutputPriceTertileLabels(
     formatRange: (lo: number, hi: number) => string
   ): string => {
     const seg = sorted.slice(start, end)
-    if (seg.length === 0) return '—'
+    if (seg.length === 0) return '-'
     const costs = seg
       .map(listedExchangeCostUsd)
       .filter((x): x is number => x != null && Number.isFinite(x))
       .map(x => Math.max(0, x))
-    if (costs.length === 0) return '—'
+    if (costs.length === 0) return '-'
     const lo = Math.min(...costs)
     const hi = Math.max(...costs)
     return formatRange(lo, hi)
