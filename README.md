@@ -30,6 +30,10 @@ The refusal detection heuristics are tuned for jailbreak-style prompts, but the 
 
 **Red Team mode** - run one prompt against multiple models in parallel. Each response is automatically classified: complied, refused, or unclear. Useful for comparing model behavior, testing jailbreaks, or checking how different providers handle the same input.
 
+<p align="center">
+  <img src="illustration/image3(1).jpg" width="1040" />
+</p>
+
 **Chat mode** - group chat with multiple models simultaneously. Useful when you want to compare how different models respond to the same conversation, or just talk to models without an extra layer of content filtering between you and the API.
 
 Each model receives only the shared conversation history - it never sees what other models replied. This prevents response contamination: model B's answer cannot influence model A's output, so you get independent responses to the same input rather than models reacting to each other.
