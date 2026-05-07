@@ -2166,6 +2166,20 @@ textarea {
 
 /* .btn--primary: same as .btn; class used in markup for primary actions */
 
+.btn--danger {
+  background: color-mix(in srgb, #c0392b 80%, var(--page-bg));
+  border-color: color-mix(in srgb, #c0392b 60%, transparent);
+  color: #fff;
+}
+.btn--danger:hover:not(:disabled) {
+  background: #c0392b;
+  border-color: #922b21;
+}
+[data-theme='dark'] .btn--danger {
+  background: color-mix(in srgb, #e74c3c 70%, #1a0a0a);
+  border-color: color-mix(in srgb, #e74c3c 50%, transparent);
+}
+
 .btn--run {
   width: 100%;
   max-width: 28rem;
@@ -4448,7 +4462,7 @@ html:not([data-theme='dark']) .chat-workspace__sidebar {
 .chat-workspace__privacy-footer {
   width: 100%;
   max-width: min(1040px, calc(100% - 2 * var(--pad-x)));
-  margin: 0.5rem auto calc(8px + env(safe-area-inset-bottom, 0px));
+  margin: auto auto calc(8px + env(safe-area-inset-bottom, 0px));
   padding: 0 var(--pad-x);
   text-align: center;
   font-size: 0.75rem;

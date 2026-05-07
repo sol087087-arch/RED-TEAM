@@ -133,6 +133,7 @@ export function RunSetupSection(props: RunSetupSectionProps) {
     promptLibrary,
     deleteTemplate,
     handleRunTests,
+    onAbortRun,
     loading,
     canRun,
     resultsCount,
@@ -682,12 +683,12 @@ export function RunSetupSection(props: RunSetupSectionProps) {
               </button>
               <button
                 type="button"
-                className="btn btn--action-fixed workspace-ui-sheen"
+                className={['btn btn--action-fixed workspace-ui-sheen', loading ? 'btn--danger' : ''].join(' ')}
                 style={chatOrbSheenStyle('redteam:run:selected')}
-                onClick={handleRunTests}
-                disabled={!canRun}
+                onClick={loading ? onAbortRun : handleRunTests}
+                disabled={!loading && !canRun}
               >
-                Run selected
+                {loading ? '⏹ Stop' : 'Run selected'}
               </button>
             </div>
           </div>
@@ -696,13 +697,16 @@ export function RunSetupSection(props: RunSetupSectionProps) {
           <div className="run-temperature-bar">
             <button
               type="button"
-              className="btn btn--primary btn--run btn--match-action run-temperature-bar__btn workspace-ui-sheen"
+              className={[
+                'btn btn--run btn--match-action run-temperature-bar__btn workspace-ui-sheen',
+                loading ? 'btn--danger' : 'btn--primary',
+              ].join(' ')}
               style={chatOrbSheenStyle('redteam:run:primary')}
-              onClick={handleRunTests}
-              disabled={!canRun}
+              onClick={loading ? onAbortRun : handleRunTests}
+              disabled={!loading && !canRun}
             >
               {loading
-                ? `Running tests... (${resultsCount}/${selectedModelsSize})`
+                ? `⏹ Stop (${resultsCount}/${selectedModelsSize})`
                 : `▶ Run Against ${selectedModelsSize} Models`}
             </button>
             <div className="run-temperature-bar__scale">

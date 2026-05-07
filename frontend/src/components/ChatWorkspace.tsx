@@ -123,6 +123,7 @@ type ChatWorkspaceProps = {
   modelPickRequiresApiKey?: boolean
   guestDemoModelId?: string
   keyGateFocusNonce?: number
+  onKeyGateOpen?: () => void
   groupChatModelIds: readonly string[]
   toggleGroupChatModel: (model: Model) => void
   groupChatMessages: readonly GroupChatMessage[]
@@ -199,6 +200,7 @@ export function ChatWorkspace(props: ChatWorkspaceProps) {
     modelPickRequiresApiKey = false,
     guestDemoModelId = '',
     keyGateFocusNonce = 0,
+    onKeyGateOpen,
     groupChatModelIds,
     toggleGroupChatModel,
     groupChatMessages,
@@ -1494,6 +1496,7 @@ export function ChatWorkspace(props: ChatWorkspaceProps) {
           modelsLoading={modelsLoading}
           composerMentionQuery={composerMentionQuery}
           onPickModel={toggleGroupChatModel}
+          onKeyRequired={modelPickRequiresApiKey ? onKeyGateOpen : undefined}
           selectedModelIds={new Set(groupChatModelIds)}
           modelPickRequiresApiKey={modelPickRequiresApiKey}
           guestDemoModelId={guestDemoModelId}

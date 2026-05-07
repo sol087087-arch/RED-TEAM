@@ -13,6 +13,7 @@ export type ChatModelPickerRowsProps = {
   /** Token after `@` in the composer - drives a top “matches” row above category carousels */
   composerMentionQuery?: string
   onPickModel?: (model: Model) => void
+  onKeyRequired?: () => void
   /** Highlight chips that are in the group-chat selection */
   selectedModelIds?: ReadonlySet<string>
   /** When set, only this model id is pickable; others are dimmed (parent still handles click) */
@@ -44,6 +45,7 @@ export function ChatModelPickerRows(props: ChatModelPickerRowsProps) {
     modelsLoading,
     composerMentionQuery = '',
     onPickModel,
+    onKeyRequired,
     selectedModelIds,
     modelPickRequiresApiKey = false,
     guestDemoModelId = '',
@@ -96,6 +98,7 @@ export function ChatModelPickerRows(props: ChatModelPickerRowsProps) {
             title={`@${mentionToken}`}
             models={matchingModels}
             onPickModel={onPickModel}
+            onKeyRequired={onKeyRequired}
             selectedModelIds={selectedModelIds}
             modelPickRequiresApiKey={modelPickRequiresApiKey}
             guestDemoModelId={guestDemoModelId}
@@ -121,6 +124,7 @@ export function ChatModelPickerRows(props: ChatModelPickerRowsProps) {
           title={section.title}
           models={section.models}
           onPickModel={onPickModel}
+          onKeyRequired={onKeyRequired}
           selectedModelIds={selectedModelIds}
           modelPickRequiresApiKey={modelPickRequiresApiKey}
           guestDemoModelId={guestDemoModelId}
@@ -133,11 +137,12 @@ export function ChatModelPickerRows(props: ChatModelPickerRowsProps) {
 function ModelCarouselChip(props: {
   model: Model
   onPickModel?: (model: Model) => void
+  onKeyRequired?: () => void
   selected?: boolean
   needsApiKey?: boolean
   guestDemoModelId?: string
 }) {
-  const { model, onPickModel, selected, needsApiKey, guestDemoModelId } = props
+  const { model, onPickModel, onKeyRequired, selected, needsApiKey, guestDemoModelId } = props
   const locked = Boolean(needsApiKey && guestDemoModelId && model.id !== guestDemoModelId)
   const chipLabel = simplifyModelDisplayName(model.name || model.id)
   return (
@@ -151,10 +156,10 @@ function ModelCarouselChip(props: {
         .filter(Boolean)
         .join(' ')}
       data-selected={selected ? true : undefined}
-      onClick={() => onPickModel?.(model)}
+      onClick={() => locked ? onKeyRequired?.() : onPickModel?.(model)}
       title={
         locked
-          ? `API key required - ${chipLabel} (${model.id})`
+          ? `Enter API key to use ${chipLabel}`
           : `${chipLabel} (${model.id})`
       }
     >
@@ -175,6 +180,7 @@ function ChatModelRowSection(props: {
   title: string
   models: readonly Model[]
   onPickModel?: (model: Model) => void
+  onKeyRequired?: () => void
   selectedModelIds?: ReadonlySet<string>
   modelPickRequiresApiKey?: boolean
   guestDemoModelId?: string
@@ -186,6 +192,7 @@ function ChatModelRowSection(props: {
     title,
     models,
     onPickModel,
+    onKeyRequired,
     selectedModelIds,
     modelPickRequiresApiKey = false,
     guestDemoModelId = '',
@@ -291,6 +298,7 @@ function ChatModelRowSection(props: {
                 onPickModel={pickModel}
                 selected={selectedModelIds?.has(model.id) ?? false}
                 needsApiKey={modelPickRequiresApiKey}
+                onKeyRequired={onKeyRequired}
                 guestDemoModelId={guestDemoModelId}
               />
             </li>

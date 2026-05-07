@@ -52,6 +52,7 @@ import {
 import type { ThemeMode } from './components/types'
 import type { AppMode } from './domain/appMode'
 import { getProviderInfo, LLM_PROVIDERS, normalizeLlmProviderId } from './services/llmProviders'
+import { LLM_MAX_OUTPUT_TOKENS } from './services/llmConfig'
 import {
   fetchLlmModels,
   fetchOpenRouterCredits,
@@ -194,10 +195,16 @@ type ExecuteModelChatArgs = {
   llm: { providerId: string; customApiBase?: string }
   externalSignal?: AbortSignal
   outputModalities?: readonly string[]
+  contextLength?: number
 }
 
 async function executeModelChatRound(args: ExecuteModelChatArgs): Promise<TestResult> {
-  const { apiKey, modelId, modelName, prompt, temperature, runId, runLabel, llm, externalSignal, outputModalities } = args
+  const { apiKey, modelId, modelName, prompt, temperature, runId, runLabel, llm, externalSignal, outputModalities, contextLength } = args
+  // Cap max_tokens so input + output never exceeds the model's context window.
+  const maxTokens =
+    typeof contextLength === 'number' && contextLength > 0
+      ? Math.min(LLM_MAX_OUTPUT_TOKENS, contextLength - 1024)
+      : Math.min(LLM_MAX_OUTPUT_TOKENS, 8192)
   const runMeta =
     runId !== undefined
       ? runLabel !== undefined
@@ -225,6 +232,7 @@ async function executeModelChatRound(args: ExecuteModelChatArgs): Promise<TestRe
       model: modelId,
       messages: [{ role: 'user', content: prompt }],
       temperature,
+      maxTokens,
       signal: ctrl.signal,
       providerId: llm.providerId,
       customApiBase: llm.customApiBase,
@@ -402,6 +410,11 @@ function App() {
   const redTeamGuestTurnRef = useRef(0)
   const currentRunIdRef = useRef<string | null>(null)
   const runAbortRef = useRef<AbortController | null>(null)
+
+  const abortRun = useCallback(() => {
+    runAbortRef.current?.abort()
+    runAbortRef.current = null
+  }, [])
   const balanceErrorCount = useRef(0)
   const copiedKeyTimerRef = useRef<number | null>(null)
   const [lastResultAt, setLastResultAt] = useState<number | null>(null)
@@ -1873,6 +1886,7 @@ function App() {
         llm,
         externalSignal: runAbortController.signal,
         outputModalities: modelObj?.outputModalities,
+        contextLength: modelObj?.context_length,
       })
     })
 
@@ -1948,6 +1962,7 @@ function App() {
             runLabel: snapshot.runLabel,
             llm: { providerId: pid, customApiBase },
             outputModalities: modelObj?.outputModalities,
+            contextLength: modelObj?.context_length,
           })
       setResults(prev => prev.map(r => (r.modelId === modelId ? newResult : r)))
       setLastResultAt(Date.now())
@@ -2087,6 +2102,7 @@ function App() {
           modelPickRequiresApiKey={!keySaved}
           guestDemoModelId={GUEST_DEMO_MODEL_ID}
           keyGateFocusNonce={keyGateFocusNonce}
+          onKeyGateOpen={() => setKeyGateFocusNonce(n => n + 1)}
           groupChatModelIds={groupChatModelIds}
           toggleGroupChatModel={toggleGroupChatModel}
           groupChatMessages={groupChatMessages}
@@ -2111,7 +2127,7 @@ function App() {
           downloadAppUrl={
             (typeof import.meta.env.VITE_DOWNLOAD_APP_URL === 'string' &&
               import.meta.env.VITE_DOWNLOAD_APP_URL.trim()) ||
-            'https://github.com/sol087087-arch/RED-TEAM'
+            'https://github.com/sol087087-arch/RED-TEAM/archive/refs/heads/feature/chatbot-service.zip'
           }
           onExploreAddThreeCheapModels={exploreAddThreeCheapModels}
           onRegenerateGroupChatLine={regenerateGroupChatLine}
@@ -2177,6 +2193,7 @@ function App() {
                     promptLibrary={promptLibrary}
                     deleteTemplate={deleteTemplate}
                     handleRunTests={handleRunTests}
+                    onAbortRun={abortRun}
                     loading={loading}
                     canRun={!loading && selectedModels.size > 0 && !!prompt.trim()}
                     resultsCount={results.length}

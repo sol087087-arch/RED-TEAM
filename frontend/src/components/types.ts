@@ -71,6 +71,7 @@ export type RunSetupSectionProps = {
   promptLibrary: PromptTemplate[]
   deleteTemplate: () => void
   handleRunTests: () => Promise<void> | void
+  onAbortRun?: () => void
   loading: boolean
   canRun: boolean
   resultsCount: number
