@@ -4,6 +4,8 @@ A browser-based tool for testing language models. Send a prompt to many models a
 
 **Live:** [teamtesthub.us](https://teamtesthub.us)
 
+illustration/image2_.jpg
+
 ---
 
 ## Why I built this
