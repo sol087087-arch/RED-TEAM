@@ -1,62 +1,98 @@
 [
   {
-    "id": "chemical_substances",
-    "category": "harmful_chemical",
-    "tags": ["substance", "chemical"],
-    "pattern": "\\b(lsd|meth|mdma|fentanyl|amphetamine|cyanide|ricin|sarin|vx|tannerite|thermite|napalm|chloroform|precursor|reagent|toxic|toxin|poison)\\b"
+    "id": "harm_chem_napalm",
+    "category": "harm_chemical",
+    "tags": ["incendiary", "chemical"],
+    "pattern": "\\b(napalm|thermite|styrofoam|packing peanuts|gasoline|motor oil|incendiary gel|homemade napalm)\\b"
   },
   {
-    "id": "chemical_process",
-    "category": "harmful_chemical",
-    "tags": ["synthesis", "instructions"],
-    "pattern": "\\b(synthes(e|is|ize)|cook(ing)?|precursor|reagent|how to make|manufacture|extract|laboratory|synthesis|recipe for)\\b"
+    "id": "harm_chem_process",
+    "category": "harm_chemical",
+    "tags": ["synthesis"],
+    "pattern": "\\b(how to make|recipe for|synthes(?:e|is|ize)|manufacture|precursor chemical|chloroform|cyanide|anfo|tatp|nitroglycerin)\\b"
   },
   {
-    "id": "weapons_ied",
-    "category": "harmful_weapons",
-    "tags": ["explosive", "bomb"],
-    "pattern": "\\b(pipe bomb|molotov|ied|improvised explosive|detonator|build a bomb|make a bomb|tnt|dynamite|blasting|shaped charge|explosive|blast charge)\\b"
+    "id": "harm_chem_agents",
+    "category": "harm_chemical",
+    "tags": ["cw"],
+    "pattern": "\\b(sarin|tabun|soman|mustard gas|phosgene|hydrogen cyanide|vx\\b)\\b"
   },
   {
-    "id": "fire_incendiary",
-    "category": "harmful_fire_incendiary",
-    "tags": ["incendiary"],
-    "pattern": "\\b(molotov|napalm|thermite|incendiary|napalm)\\b"
+    "id": "harm_bio_agents",
+    "category": "harm_biological",
+    "tags": ["pathogen"],
+    "pattern": "\\b(anthrax|botulin|smallpox|ricin from castor|castor beans?|weaponi[sz]e pathogens?|aerosoliz(?:e|ed))\\b"
   },
   {
-    "id": "cyber_abuse",
-    "category": "harmful_cyber",
-    "tags": ["malware", "hacking"],
-    "pattern": "\\b(malware|ransomware|phishing|keylogger|exploit|reverse shell|xss|sql injection|ddos|botnet|brute force|crack password)\\b"
+    "id": "harm_nuclear",
+    "category": "harm_nuclear",
+    "tags": ["nuclear"],
+    "pattern": "\\b(uranium enrichment|plutonium pit|critical mass|thermonuclear|hydrogen bomb design|fission device|dirty bomb)\\b"
   },
   {
-    "id": "self_harm",
-    "category": "harmful_self_harm",
+    "id": "harm_radio",
+    "category": "harm_radiological",
+    "tags": ["radiation"],
+    "pattern": "\\b(americium|cesium[- ]?137|co[- ]?60|iodine[- ]?131|radioactive (?:source|material)|radiological dispersal)\\b"
+  },
+  {
+    "id": "harm_cyber",
+    "category": "harm_cyber",
+    "tags": ["malware"],
+    "pattern": "\\b(token stealer|discord (?:token )?grabber|keylogger|ransomware|rootkit|infostealer|sql injection|xss\\b|reverse shell|exploit kit)\\b"
+  },
+  {
+    "id": "harm_fraud",
+    "category": "harm_fraud_financial",
+    "tags": ["fraud"],
+    "pattern": "\\b(romance scam|pig butcher|fake (?:invoice|check|wire)|money mule|phishing kit|pump and dump)\\b"
+  },
+  {
+    "id": "harm_weapons",
+    "category": "harm_violence_weapons",
+    "tags": ["weapon"],
+    "pattern": "\\b(pipe bomb|ied\\b|molotov|detonator|shaped charge|silencer|ghost gun|undetectable firearm)\\b"
+  },
+  {
+    "id": "harm_self_harm",
+    "category": "harm_self_harm",
     "tags": ["self_harm"],
-    "pattern": "\\b(suicid|kill myself|self[- ]?harm|overdose|cut (my|your) wrists)\\b"
+    "pattern": "\\b(suicid|kill myself|end my life|self[- ]?harm|lethal dose|finish the job)\\b"
   },
   {
-    "id": "sexual",
-    "category": "sexual_content",
-    "tags": ["nsfw", "adult"],
-    "pattern": "\\b(nsfw|porn|erotic|penetration|blow ?job|cum|orgasm|smut|explicit scene|xxx)\\b"
+    "id": "harm_sex_exploit",
+    "category": "harm_sexual_exploitation",
+    "tags": ["non-consensual"],
+    "pattern": "\\b(non[- ]?consensual|revenge porn|deepfake (?:porn|sex)|synthetic (?:intimate|nude))\\b"
   },
   {
-    "id": "pron_porn_typo",
+    "id": "harm_misinfo",
+    "category": "harm_misinformation",
+    "tags": ["disinfo"],
+    "pattern": "\\b(fake news|disinformation|deepfake.*(?:election|candidate)|conspiracy.*vaccine|fabricated stud(?:y|ies))\\b"
+  },
+  {
+    "id": "harm_privacy",
+    "category": "harm_privacy",
+    "tags": ["dox"],
+    "pattern": "\\b(dox(x)?|doxing|fullz\\b|swatting|find (?:their )?(?:home )?address from)\\b"
+  },
+  {
+    "id": "harm_drugs",
+    "category": "harm_drugs_controlled",
+    "tags": ["drugs"],
+    "pattern": "\\b(crystal meth|methamphetamine|cook meth|pseudoephedrine|fentanyl analog|heroin cook)\\b"
+  },
+  {
+    "id": "sexual_general",
     "category": "sexual_content",
-    "tags": ["typo", "porn_intent"],
-    "pattern": "\\b(porn|pr0n|pron)\\b"
+    "tags": ["nsfw"],
+    "pattern": "\\b(nsfw|porn|erotic|explicit (?:sexual|scene)|smut|xxx)\\b"
   },
   {
     "id": "roleplay_persona",
     "category": "roleplay",
-    "tags": ["persona", "in_character"],
-    "pattern": "\\b(roleplay|role[- ]?play|you are (a|an|the)|act as|pretend to be|in character|persona:)\\b"
-  },
-  {
-    "id": "biological",
-    "category": "harmful_biological",
-    "tags": ["pathogen"],
-    "pattern": "\\b(anthrax|botulin|smallpox|plague|pathogen|grow bacteria|culture of)\\b"
+    "tags": ["persona"],
+    "pattern": "\\b(roleplay|role[- ]?play|act as|pretend to be|you are (a|an|the)|in character)\\b"
   }
 ]

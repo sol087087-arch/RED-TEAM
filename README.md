@@ -1,105 +1,118 @@
-<p align="center">
-</p>
+# TeamTestHub
 
-<h1 align="center">T E A M &nbsp; T E S T &nbsp; H U B</h1>
+A browser-based tool for testing language models. Send a prompt to many models at once, see who complies and who refuses.
 
-<p align="center">
-  <a href="https://teamtesthub.us"><strong>teamtesthub.us</strong></a>
-</p>
-
-<p align="center">
-  <strong>Drop one prompt. Watch every model squirm (or comply).</strong><br />
-  Built for red teamers, prompt engineers, and researchers who are tired of the "twelve-tab dance."
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Security-Red_Teaming-red?style=for-the-badge" alt="Security: Red Teaming" />
-  <img src="https://img.shields.io/badge/Focus-Privacy-blue?style=for-the-badge" alt="Focus: Privacy" />
-  <img src="https://img.shields.io/badge/Powered_by-OpenRouter-black?style=for-the-badge" alt="Powered by OpenRouter" />
-</p>
+**Live:** [teamtesthub.us](https://teamtesthub.us)
 
 ---
 
-### The Workflow
+## Why I built this
 
-Standard testing is slow. **TeamTestHub** is a shotgun blast to the face of LLM safety layers.
+Testing the same prompt across a dozen model UIs by hand is slow, frustrating, and doesn't scale. Models served via API also tend to have fewer content restrictions than their consumer interfaces — which makes them more useful for dataset generation, prompt research, and anything where you need honest output rather than a sanitized one.
 
-- **Parallel Blast:** Send one prompt to an entire fleet of models simultaneously.
-- **Refusal Radar:** Heuristic detection for "Creative Refusal Theater" (e.g., `cannot provide`, `against policy`, `safety guidelines`).
-- **Live Stream:** Real-time replies with latency tracking and pass/block status.
-- **Compare & Contrast:** Side-by-side analysis to see which model's guardrails flipped first.
+I needed something that let me run large batches of prompts across many models at once, see the results side by side, and not spend ten minutes clicking through different websites to do it. OpenRouter solves the API aggregation problem but not the interface problem — so I built my own.
 
----
+How I actually use it:
 
-### Feature Set
+- I moderate [r/GPT_jailbreaks](https://reddit.com/r/GPT_jailbreaks) and use this to quickly verify whether a submitted jailbreak actually works across current models, or whether it's just a prompt that looks interesting but does nothing
+- I work on dataset generation and model fine-tuning — running the same task across hundreds of models and ranking outputs by quality, speed, and consistency is much easier when everything is in one place and exports to JSON, CSV, or Markdown
+- General prompt testing: figuring out which model handles a specific task best before committing to it for a larger workload
 
-| Feature | Description |
-| :--- | :--- |
-| **🎯 Direct Targeting** | Resend to a single model without re-running the entire batch. |
-| **🔄 Thread Continuity** | Continue the conversation with successful replies. |
-| **📚 Local Library** | Save templates and labels directly in your browser (`localStorage`). |
-| **📦 Data Export** | Clean exports to **JSON, Markdown, or CSV**. |
-| **📱 Mobile Ready** | Optimized export defaults for mobile research. |
+The refusal detection heuristics are tuned for jailbreak-style prompts, but the tool itself is general purpose. If you have ideas for how to make it more useful, open an issue.
 
 ---
 
-### Privacy First
+## What it does
 
-We don't want your data, and we definitely don't want your keys.
+**Red Team mode** — run one prompt against multiple models in parallel. Each response is automatically classified: complied, refused, or unclear. Useful for comparing model behavior, testing jailbreaks, or checking how different providers handle the same input.
 
-- **Zero Backend:** The app is a collection of static files.
-- **Client-Side Keys:** Your OpenRouter API key stays in `sessionStorage`.
-- **No Cookies:** No tracking, no drama, no telemetry.
+**Chat mode** — group chat with multiple models simultaneously. Useful when you want to compare how different models respond to the same conversation, or just talk to models without an extra layer of content filtering between you and the API.
+
+Each model receives only the shared conversation history — it never sees what other models replied. This prevents response contamination: model B's answer cannot influence model A's output, so you get independent responses to the same input rather than models reacting to each other.
+
+Bring your own API key (OpenRouter, or direct provider). Nothing is stored — keys and chat history stay in your browser only.
+
+## Why there's no backend
+
+Storing other people's API keys is a responsibility I have no interest in taking on. There's no server, no database, no logs. Your keys, your prompts, and your conversations with models never leave your browser — I have no way to see them and no desire to. Use the tool however you want; what you do with it is entirely your business.
 
 ---
 
-### Getting Started
+## Who it's for
 
-#### Run it locally
+- Red team researchers comparing model safety across providers
+- People who work with LLMs daily and want a faster way to test prompts
+- Anyone curious about how different models handle the same question
+- Prompt engineers testing new jailbreaks or system prompt designs
+
+This is not a product or a SaaS. It's a tool I built for myself and made usable for others.
+
+---
+
+## Stack
+
+React 18 + TypeScript + Vite. No backend. All API calls go directly from your browser to the provider.
+
+---
+
+## Repository structure
+
+```
+RED-TEAM/
+└── prompt-testing-platform/
+    ├── frontend/
+    │   ├── src/       # React + TypeScript core
+    │   ├── public/    # SEO & static assets
+    │   └── dist/      # Production output
+    ├── backend/       # Optional FastAPI stack (not used in production)
+    └── logo*.png      # Branding assets
+```
+
+---
+
+## Run locally
 
 ```bash
-git clone https://github.com/sol087087-arch/RED-TEAM.git
-cd RED-TEAM/frontend
-
+cd prompt-testing-platform/frontend
 npm install
 npm run dev
 ```
 
-Navigate to **http://localhost:5173**, paste your `sk-or-v1-…` key, and start testing.
+> On Windows you can also run `setup.bat` from the `prompt-testing-platform/` folder.
 
-#### Production build
+Open `http://localhost:5173`. Enter your OpenRouter API key (or any OpenAI-compatible endpoint) and start testing.
 
-From the repository root (the folder that contains `frontend/`):
+### Production build
 
 ```bash
-cd frontend
 npm run build
 ```
 
-Deploy the contents of **`frontend/dist/`** to any static host (IONOS, Vercel, Netlify, AWS S3, etc.).
+Required environment variable for production:
 
----
-
-### Repository structure
-
-```text
-RED-TEAM/
-├── frontend/
-│   ├── src/           # React + TypeScript core
-│   ├── public/        # SEO & static assets
-│   └── dist/          # Production output
-├── backend/           # Optional FastAPI stack (if needed)
-└── logo*.png          # Branding assets
 ```
-
-Environment variable for production:
-
-```bash
 VITE_OPENROUTER_API_BASE=https://openrouter.ai/api/v1
 ```
 
 ---
 
-### License
-MIT © TeamTestHub
+## Models
 
+Supports OpenRouter (400+ models) and custom OpenAI-compatible endpoints. Without an API key, the full model list is visible — you can browse and enter a key to unlock.
+
+---
+
+## Refusal detection
+
+Responses are automatically classified using heuristic pattern matching — first-person refusals, dialect variants, BPE tokenizer artifacts, content filter signals. Classification is intentionally transparent: every result shows the reason.
+
+`complied` means the model answered. `fail` means it refused. `unknown` means the signal was ambiguous.
+
+---
+
+## Roadmap
+
+- **Mutation engine** — automatically vary a prompt (paraphrase, role injection, language switch, encoding tricks) and run all variants across all selected models. UI placeholder is already there; implementation is next.
+- More providers beyond OpenRouter
+- Local model support (Ollama, LM Studio, and other OpenAI-compatible local endpoints)
+- Possibly a fuller hub over time, but no promises

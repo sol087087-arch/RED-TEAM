@@ -39,7 +39,8 @@ export function readStoredSession(options: SessionReadOptions): {
       ? data.selectedModelIds.filter((x): x is string => typeof x === 'string')
       : []
     return { prompt, results, temperature, selectedModelIds }
-  } catch {
+  } catch (err) {
+    console.warn('[storage] Failed to read session data', err)
     return { prompt: '', results: [], temperature: defaultTemperature, selectedModelIds: [] }
   }
 }
@@ -63,7 +64,8 @@ export function loadPromptLibrary(storageKey: string): PromptTemplate[] {
         )
       })
       .slice(0, 200)
-  } catch {
+  } catch (err) {
+    console.warn('[storage] Failed to read prompt library', err)
     return []
   }
 }

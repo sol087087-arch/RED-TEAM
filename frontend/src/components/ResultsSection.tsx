@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { RunSnapshot, TestResult } from '../domain/types'
 import { buildCompareRunSideByRows } from '../features/compare/compareRunDiff'
+import { chatOrbSheenStyle } from '../features/chat/modelChipSheen'
+import { ReplyRichBody } from '../features/render/ReplyRichBody'
 import { FilterDropdown } from './FilterDropdown'
+import { ProviderIcon } from './ProviderIcon'
 import type { ResultsSectionProps } from './types'
 
 function compareRunHeaderLine(prefix: string, r: RunSnapshot) {
@@ -12,7 +15,7 @@ function CompareStatusCell({ status }: { status: TestResult['status'] | null }) 
   if (status === null) {
     return (
       <span className="run-compare__na" title="No result for this model in this run">
-        —
+        -
       </span>
     )
   }
@@ -102,7 +105,7 @@ function CompareRunsMatrixView({ runA, runB }: { runA: RunSnapshot; runB: RunSna
         </table>
       </div>
       <p className="hint run-compare__legend">
-        ✓ complied · ✗ blocked · ? unclear · ▲ error · — missing in that run. Highlighted rows differ between the
+        ✓ complied · ✗ blocked · ? unclear · ▲ error · - missing in that run. Highlighted rows differ between the
         two runs.
       </p>
     </div>
@@ -111,7 +114,6 @@ function CompareRunsMatrixView({ runA, runB }: { runA: RunSnapshot; runB: RunSna
 
 export function ResultsSection(props: ResultsSectionProps) {
   const {
-    keySaved,
     runHistory,
     compareRunAId,
     compareRunBId,
@@ -150,6 +152,7 @@ export function ResultsSection(props: ResultsSectionProps) {
     retryModelPrompt,
     retryingModels,
     hasPromptToRetry,
+    removeResultAt,
   } = props
 
   const [exportOpen, setExportOpen] = useState(false)
@@ -192,7 +195,7 @@ export function ResultsSection(props: ResultsSectionProps) {
       {
         value: '',
         labelShort: 'Baseline run',
-        labelFull: 'Baseline run — first run in the compare pair',
+        labelFull: 'Baseline run - first run in the compare pair',
       },
       ...runHistory.map(r => ({
         value: r.id,
@@ -208,7 +211,7 @@ export function ResultsSection(props: ResultsSectionProps) {
       {
         value: '',
         labelShort: 'Compare to run',
-        labelFull: 'Compare to run — second run in the compare pair',
+        labelFull: 'Compare to run - second run in the compare pair',
       },
       ...runHistory.map(r => ({
         value: r.id,
@@ -221,13 +224,13 @@ export function ResultsSection(props: ResultsSectionProps) {
 
   const closeExportMenu = () => setExportOpen(false)
 
-  if (!keySaved) return null
-
   return (
     <section className="section">
       <div className="section-header">
-        <span className="section-num">4</span>
-        <h2>Results</h2>
+        <h2>
+          <span className="redteam-section-mark" aria-hidden="true" />
+          <span>Result</span>
+        </h2>
       </div>
       {!isMobile && runHistory.length > 1 && (
         <div className="run-compare">
@@ -266,13 +269,22 @@ export function ResultsSection(props: ResultsSectionProps) {
             <div className="chat-panel__title-wrap">
               <strong className="chat-panel__title">Continue chat</strong>
               <span className="chat-panel__meta">
-                {activeChatResult?.modelName || activeChatModelId}
-                {activeChatResult?.latencyMs !== null && activeChatResult?.latencyMs !== undefined
-                  ? ` · last ${activeChatResult.latencyMs}ms`
-                  : ''}
+                <ProviderIcon modelId={activeChatModelId} size={15} className="chat-panel__meta-icon" />
+                <span className="chat-panel__meta-text">
+                  {activeChatResult?.modelName || activeChatModelId}
+                  {activeChatResult?.latencyMs !== null && activeChatResult?.latencyMs !== undefined
+                    ? ` · last ${activeChatResult.latencyMs}ms`
+                    : ''}
+                </span>
               </span>
             </div>
-            <button type="button" className="btn btn--close" onClick={closeContinueChat} aria-label="Close chat">
+            <button
+              type="button"
+              className="btn btn--close workspace-ui-sheen"
+              style={chatOrbSheenStyle('results:chat:close')}
+              onClick={closeContinueChat}
+              aria-label="Close chat"
+            >
               ×
             </button>
           </div>
@@ -306,7 +318,13 @@ export function ResultsSection(props: ResultsSectionProps) {
               }}
               disabled={chatLoading}
             />
-            <button type="button" className="btn btn--primary" onClick={() => void sendContinueChat()} disabled={chatLoading || !chatInput.trim()}>
+            <button
+              type="button"
+              className="btn btn--primary workspace-ui-sheen"
+              style={chatOrbSheenStyle('results:chat:send')}
+              onClick={() => void sendContinueChat()}
+              disabled={chatLoading || !chatInput.trim()}
+            >
               {chatLoading ? 'Sending...' : 'Send'}
             </button>
           </div>
@@ -344,7 +362,8 @@ export function ResultsSection(props: ResultsSectionProps) {
             <div className="export-buttons" role="group" aria-label="Results actions">
               <button
                 type="button"
-                className="btn btn--match-action btn--icon-action clear-results-btn-mobile"
+                className="btn btn--match-action btn--icon-action clear-results-btn-mobile workspace-ui-sheen"
+                style={chatOrbSheenStyle('results:clear')}
                 onClick={clearResults}
                 aria-label="Clear all results in this run"
                 title="Clear all results in this run"
@@ -357,7 +376,8 @@ export function ResultsSection(props: ResultsSectionProps) {
               >
                 <button
                   type="button"
-                  className="btn btn--match-action btn--icon-action export-menu__toggle"
+                  className="btn btn--match-action btn--icon-action export-menu__toggle workspace-ui-sheen"
+                  style={chatOrbSheenStyle('results:export:toggle')}
                   aria-label={isMobile ? 'Download JSON report' : 'Download report'}
                   title={isMobile ? 'Download JSON report' : 'Download report'}
                   aria-expanded={!isMobile ? exportOpen : undefined}
@@ -471,7 +491,7 @@ export function ResultsSection(props: ResultsSectionProps) {
 
           <div className="results-list">
             {results.map((result, idx) => (
-              <article key={`${result.modelId}-${idx}`} className={`response-card status-${result.status}`}>
+              <article key={result.modelId} className={`response-card status-${result.status}`}>
                 <header className="response-header">
                   <div className={`response-badge ${responseStatusBadgeClass(result.status)}`}>
                     <span
@@ -495,7 +515,10 @@ export function ResultsSection(props: ResultsSectionProps) {
                     </span>
                   </div>
                   <div className="response-title">
-                    <h3>{result.modelName}</h3>
+                    <div className="response-title__head">
+                      <ProviderIcon modelId={result.modelId} size={22} className="response-title__icon" />
+                      <h3>{result.modelName}</h3>
+                    </div>
                     <div className="response-meta">
                     {[
                       !isMobile && result.latencyMs !== null ? `${result.latencyMs}ms` : null,
@@ -509,37 +532,35 @@ export function ResultsSection(props: ResultsSectionProps) {
                     </div>
                   </div>
                   <div className="response-actions">
-                    {!result.response.trim() ? (
-                      <>
-                        {!isMobile && retryingModels.includes(result.modelId) ? (
-                          <span className="response-retry-label" aria-live="polite">
-                            Retrying…
-                          </span>
-                        ) : null}
-                        <button
-                          type="button"
-                          className={`copy-icon-btn copy-icon-btn--response${
-                            retryingModels.includes(result.modelId) ? ' copy-icon-btn--response-retrying' : ''
-                          }`}
-                          onClick={() => void retryModelPrompt(result.modelId)}
-                          disabled={!hasPromptToRetry || retryingModels.includes(result.modelId)}
-                          aria-label={`Resend test prompt to ${result.modelName}`}
-                          title={
-                            retryingModels.includes(result.modelId)
-                              ? 'Retry in progress…'
-                              : !hasPromptToRetry
-                                ? 'Enter a prompt in section 3 to resend'
-                                : 'Send the current test prompt to this model again'
-                          }
-                        >
-                          <span className="response-action-icon response-action-icon--retry" aria-hidden="true" />
-                        </button>
-                      </>
+                    {!isMobile && retryingModels.includes(result.modelId) ? (
+                      <span className="response-retry-label" aria-live="polite">
+                        Retrying…
+                      </span>
                     ) : null}
+                    <button
+                      type="button"
+                      className={`copy-icon-btn copy-icon-btn--response workspace-ui-sheen${
+                        retryingModels.includes(result.modelId) ? ' copy-icon-btn--response-retrying' : ''
+                      }`}
+                      style={chatOrbSheenStyle(`results:retry:${result.modelId}`)}
+                      onClick={() => void retryModelPrompt(result.modelId)}
+                      disabled={!hasPromptToRetry || retryingModels.includes(result.modelId)}
+                      aria-label={`Resend test prompt to ${result.modelName}`}
+                      title={
+                        retryingModels.includes(result.modelId)
+                          ? 'Retry in progress…'
+                          : !hasPromptToRetry
+                            ? 'Enter a prompt in section 3 to resend'
+                            : 'Send the current test prompt to this model again'
+                      }
+                    >
+                      <span className="response-action-icon response-action-icon--retry" aria-hidden="true" />
+                    </button>
                     {!result.error && !!result.response.trim() ? (
                       <button
                         type="button"
-                        className="copy-icon-btn copy-icon-btn--response"
+                        className="copy-icon-btn copy-icon-btn--response workspace-ui-sheen"
+                        style={chatOrbSheenStyle(`results:continue:${result.modelId}`)}
                         onClick={() => openContinueChat(result)}
                         aria-label={`Continue chat with ${result.modelName}`}
                         title="Continue chat"
@@ -550,7 +571,8 @@ export function ResultsSection(props: ResultsSectionProps) {
                     {(!isMobile || (!result.error && !!result.response.trim())) && (
                       <button
                         type="button"
-                        className="copy-icon-btn copy-icon-btn--response"
+                        className="copy-icon-btn copy-icon-btn--response workspace-ui-sheen"
+                        style={chatOrbSheenStyle(`results:copy:${result.modelId}:${idx}`)}
                         onClick={() =>
                           copyText(
                             result.error
@@ -571,6 +593,16 @@ export function ResultsSection(props: ResultsSectionProps) {
                         )}
                       </button>
                     )}
+                    <button
+                      type="button"
+                      className="copy-icon-btn copy-icon-btn--response workspace-ui-sheen"
+                      style={chatOrbSheenStyle(`results:hide:${result.modelId}:${idx}`)}
+                      onClick={() => removeResultAt(idx)}
+                      aria-label={`Hide result card for ${result.modelName}`}
+                      title="Hide this result card"
+                    >
+                      <span className="response-action-icon response-action-icon--clear" aria-hidden="true" />
+                    </button>
                   </div>
                 </header>
                 {result.error ? (
@@ -578,7 +610,7 @@ export function ResultsSection(props: ResultsSectionProps) {
                 ) : (
                   <div className="scroll-fade-shell scroll-fade-shell--reply">
                     <div className="scroll-fade-viewport scroll-fade-viewport--reply">
-                      <pre className="reply-window">{result.response.trim() ? result.response : '(empty response)'}</pre>
+                      <ReplyRichBody text={result.response} />
                     </div>
                   </div>
                 )}

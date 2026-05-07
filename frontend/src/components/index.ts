@@ -1,4 +1,8 @@
+export { ProviderIcon } from './ProviderIcon'
 export { ApiKeySection } from './ApiKeySection'
+export { ChatTeaserPreview } from './ChatTeaserPreview'
+export { ChatWorkspace } from './ChatWorkspace'
+export type { ChatKeyBalanceState } from './ChatWorkspace'
 export { FirstPagePreview } from './FirstPagePreview'
 export { RunSetupSection } from './RunSetupSection'
 export { ResultsSection } from './ResultsSection'

@@ -1,4 +1,10 @@
 import type { PromptClassify, ReplyStatus, ResponseShapeSummary, RunSnapshot, TestResult } from '../../domain/types'
+import { formatTaxonomyLabel, HARM_TAXONOMY_LABELS } from '../heuristics/harmTaxonomy'
+
+function safeMdFence(content: string): string {
+  if (!content.includes('```')) return `\`\`\`\n${content}\n\`\`\``
+  return `~~~\n${content.replace(/~~~/g, '\\~~~')}\n~~~`
+}
 
 type RealismTag = 'likely_recipe' | 'possibly_fantasy'
 
@@ -118,7 +124,7 @@ export function buildJsonExport(input: ExportInput): { filename: string; content
   const ctx = resolveExportContext(results, runLabel, runHistory)
   const summary = buildExportRunSummary(results)
   const data = {
-    schema_version: '1.1',
+    schema_version: '1.2',
     app: 'teamtesthub-prompt-testing',
     run_id: ctx.runId,
     exported_at: ctx.exportedAt,
@@ -131,7 +137,18 @@ export function buildJsonExport(input: ExportInput): { filename: string; content
     summary,
     reply_status_legend: REPLY_STATUS_LEGEND,
     classification: {
+      harm_taxonomy_labels: HARM_TAXONOMY_LABELS,
       heuristic: promptClassify ?? null,
+      primary_label:
+        promptClassify && promptClassify.primary_category !== 'unknown'
+          ? formatTaxonomyLabel(promptClassify.primary_category)
+          : null,
+      scores_by_domain_labeled:
+        promptClassify && Object.keys(promptClassify.scores).length > 0
+          ? Object.fromEntries(
+              Object.entries(promptClassify.scores).map(([k, v]) => [formatTaxonomyLabel(k), v])
+            )
+          : null,
     },
     target_model_defaults: {
       provider: 'openrouter',
@@ -186,10 +203,27 @@ export function buildMarkdownExport(input: ExportInput): { filename: string; con
     md += `- Run executed at: ${ctx.runExecutedAt}\n`
   }
   md += `- Temperature: **${temperature}**\n\n`
-  if (promptClassify) {
-    md += `- Prompt heuristic: ${promptClassify.primary_category} (rule match strength ${(promptClassify.confidence * 100).toFixed(0)}%)\n`
+  if (promptClassify && promptClassify.primary_category !== 'unknown') {
+    md += `### Prompt taxonomy (harm domains)\n\n`
+    md += `- **Primary:** ${formatTaxonomyLabel(promptClassify.primary_category)} (\`${promptClassify.primary_category}\`)\n`
+    md += `- **Match strength:** ${(promptClassify.confidence * 100).toFixed(0)}%\n`
+    if (Object.keys(promptClassify.scores).length > 0) {
+      md += `- **Scores by domain:**\n`
+      for (const [k, v] of Object.entries(promptClassify.scores)) {
+        md += `  - ${formatTaxonomyLabel(k)} (\`${k}\`): ${v}\n`
+      }
+    }
+    if (promptClassify.secondary_categories.length > 0) {
+      md += `- **Also matched:** ${promptClassify.secondary_categories.map(c => `${formatTaxonomyLabel(c)} (\`${c}\`)`).join(', ')}\n`
+    }
+    if (promptClassify.matched_rules.length > 0) {
+      md += `- **Matched rule ids:** ${promptClassify.matched_rules.join(', ')}\n`
+    }
+    md += `\n`
+  } else if (promptClassify) {
+    md += `- **Prompt taxonomy:** no harm-domain triggers matched.\n\n`
   }
-  md += `\n---\n\n`
+  md += `---\n\n`
   md += `## Summary\n\n`
   md += `| Metric | Count |\n| --- | ---: |\n`
   md += `| Models in export | ${exSummary.models_count} |\n`
@@ -209,10 +243,10 @@ export function buildMarkdownExport(input: ExportInput): { filename: string; con
   md += `## Model roster\n\n`
   md += `| # | Model | Model ID | Reply status | Latency (ms) |\n| --- | --- | --- | --- | ---: |\n`
   results.forEach((r, i) => {
-    md += `| ${i + 1} | ${escapeMarkdownCell(r.modelName)} | ${escapeMarkdownCell(r.modelId)} | \`${r.status}\` | ${r.latencyMs ?? '—'} |\n`
+    md += `| ${i + 1} | ${escapeMarkdownCell(r.modelName)} | ${escapeMarkdownCell(r.modelId)} | \`${r.status}\` | ${r.latencyMs ?? '-'} |\n`
   })
   md += `\n---\n\n`
-  md += `## Test Prompt\n\n\`\`\`\n${prompt}\n\`\`\`\n\n`
+  md += `## Test Prompt\n\n${safeMdFence(prompt)}\n\n`
   md += `---\n\n`
   md += `## Model outputs\n\n`
   results.forEach(r => {
@@ -228,7 +262,7 @@ export function buildMarkdownExport(input: ExportInput): { filename: string; con
               : '? UNKNOWN'
     const normalized = summarizeResponseShape(r.response)
     const realism = responseRealismTag(normalized)
-    md += `## ${r.modelName} — ${badge}\n\n`
+    md += `## ${r.modelName} - ${badge}\n\n`
     md += `- Model ID: ${r.modelId}\n`
     md += `- Latency: ${r.latencyMs ?? 'N/A'} ms\n`
     md += `- Reply reason: ${r.reason ?? 'n/a'}\n`
@@ -238,7 +272,7 @@ export function buildMarkdownExport(input: ExportInput): { filename: string; con
     if (r.error) {
       md += `**Error:** ${r.error}\n\n`
     } else {
-      md += `### Full Model Output\n\n\`\`\`\n${r.response}\n\`\`\`\n\n`
+      md += `### Full Model Output\n\n${safeMdFence(r.response)}\n\n`
     }
     md += `---\n\n`
   })
