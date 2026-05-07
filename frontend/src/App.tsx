@@ -2122,7 +2122,7 @@ function App() {
           billingEnabled={keySaved && normalizeLlmProviderId(llmProviderId) === 'openrouter'}
           feedbackUrl={
             (typeof import.meta.env.VITE_FEEDBACK_URL === 'string' && import.meta.env.VITE_FEEDBACK_URL.trim()) ||
-            ''
+            'mailto:email@helga-sable.com?subject=TeamTestHub%20Feedback'
           }
           downloadAppUrl={
             (typeof import.meta.env.VITE_DOWNLOAD_APP_URL === 'string' &&

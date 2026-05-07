@@ -7179,21 +7179,25 @@ html:not([data-theme='dark']) .chat-model-chip:hover .chat-model-chip__avatar::b
 
 /* ─── Mobile sidebar: vertical rail → horizontal topbar ─────────────────── */
 @media (max-width: 720px) {
-  /* Root: stack topbar above main instead of side-by-side */
+  /* Root: stack topbar above main instead of side-by-side; scroll whole page so topbar scrolls away */
   .chat-workspace {
     flex-direction: column;
+    overflow-y: visible;
+    height: auto;
+    min-height: 100dvh;
+  }
+  .chat-workspace__main {
+    overflow-y: visible;
+    margin-top: 4px;
   }
 
-  /* Sidebar becomes a full-width horizontal bar */
+  /* Sidebar becomes a full-width horizontal bar — scrolls with page */
   .chat-workspace__sidebar {
     flex: 0 0 56px;
     width: 100%;
     height: 56px;
     flex-direction: row;
     align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 20;
     padding: 0 max(8px, env(safe-area-inset-left, 0px)) 0 max(8px, env(safe-area-inset-right, 0px));
     background: linear-gradient(
       90deg,
@@ -7229,6 +7233,38 @@ html:not([data-theme='dark']) .chat-model-chip:hover .chat-model-chip__avatar::b
     justify-content: space-evenly;
     align-items: center;
   }
+
+  /* Remove safe-area top padding and sticky from masthead — topbar handles both on mobile */
+  .chat-workspace__masthead {
+    position: relative;
+    padding-top: 4px;
+  }
+  /* Compact masthead form inside brand-align on mobile (before key is saved) */
+  .chat-workspace__masthead-brand-align .chat-workspace__masthead {
+    padding-top: 16px;
+    padding-bottom: 4px;
+  }
+  .chat-workspace__masthead-brand-align .chat-workspace__brand {
+    margin-top: -2px;
+    margin-bottom: 8px;
+  }
+  .chat-workspace__redteam-body,
+  .chat-workspace__sticky-chat-foot {
+    margin-top: 16px;
+  }
+  .chat-model-rows {
+    margin-top: -24px;
+  }
+
+  /* Scale logo + title down 10% on mobile */
+  .chat-workspace__logo {
+    height: 25px;
+    width: 25px;
+  }
+  .chat-workspace__title {
+    font-size: 1.215rem;
+  }
+
 
   /* Drawers open below the topbar, full-width */
   .chat-workspace__history-drawer,
