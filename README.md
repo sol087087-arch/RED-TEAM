@@ -1,6 +1,8 @@
 # TeamTestHub
 
-A browser-based tool for testing language models. Send a prompt to many models at once, see who complies and who refuses.
+A browser-based platform for comparative LLM evaluation.
+
+Run the same prompt across multiple models, compare responses side by side, measure behavioral consistency, and analyze refusal patterns.
 
 **Live:** [teamtesthub.us](https://teamtesthub.us)
 
@@ -48,10 +50,12 @@ Storing other people's API keys is a responsibility I have no interest in taking
 
 ## Who it's for
 
-- Red team researchers comparing model safety across providers
-- People who work with LLMs daily and want a faster way to test prompts
-- Anyone curious about how different models handle the same question
-- Prompt engineers testing new jailbreaks or system prompt designs
+• AI safety researchers
+• LLM evaluation and benchmarking
+• Prompt engineers
+• ML researchers building datasets
+• Developers comparing model behavior across providers
+• Security researchers working in authorized environments
 
 This is not a product or a SaaS. It's a tool I built for myself and made usable for others.
 
@@ -120,7 +124,7 @@ Responses are automatically classified using heuristic pattern matching - first-
 
 ## Roadmap
 
-- **Mutation engine** - automatically vary a prompt (paraphrase, role injection, language switch, encoding tricks) and run all variants across all selected models. UI placeholder is already there; implementation is next.
+- **Mutation engine** - automatically vary a prompt (instruction reformulation, multilingual variants, structured prompt mutations, controlled benchmark generation) and run all variants across all selected models. UI placeholder is already there; implementation is next.
 - More providers beyond OpenRouter
 - Local model support (Ollama, LM Studio, and other OpenAI-compatible local endpoints)
 - Possibly a fuller hub over time, but no promises
